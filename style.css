@@ -4,11 +4,9 @@
    Main Stylesheet
 ========================================================= */
 
-
 /* =========================================================
    1. RESET & GLOBAL
 ========================================================= */
-
 * {
     margin: 0;
     padding: 0;
@@ -38,11 +36,8 @@
     --success: #16855f;
     --success-light: #e8f7f1;
 
-    --shadow-sm:
-        0 2px 8px rgba(25, 40, 36, 0.05);
-
-    --shadow-md:
-        0 8px 30px rgba(25, 40, 36, 0.08);
+    --shadow-sm: 0 2px 8px rgba(25, 40, 36, 0.05);
+    --shadow-md: 0 8px 30px rgba(25, 40, 36, 0.08);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -56,27 +51,14 @@ html {
 
 body {
     min-height: 100vh;
-
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-
     line-height: 1.5;
-
     -webkit-font-smoothing: antialiased;
 }
 
-button,
-input,
-select {
+button, input, select {
     font: inherit;
 }
 
@@ -91,108 +73,115 @@ select:focus-visible {
     outline-offset: 2px;
 }
 
-input,
-select {
+input, select {
     width: 100%;
 }
 
 
 /* =========================================================
-   2. HEADER
+   2. HEADER & INTEGRATED INVOICE / CUSTOMER BAR
 ========================================================= */
-
 .app-header {
     width: 100%;
-
-    min-height: 76px;
-
-    padding: 14px 28px;
-
+    padding: 12px 24px;
     background: var(--surface);
-
     border-bottom: 1px solid var(--border);
-
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 25px;
-
+    flex-direction: column;
+    gap: 12px;
     position: sticky;
     top: 0;
-
     z-index: 100;
 }
 
+.header-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
 
 /* Brand */
-
 .brand {
     display: flex;
     align-items: center;
     gap: 12px;
-
     min-width: 0;
 }
 
 .brand-icon {
-    width: 44px;
-    height: 44px;
-
+    width: 42px;
+    height: 42px;
     flex-shrink: 0;
-
     border-radius: 12px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--primary),
-            var(--primary-dark)
-        );
-
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: #fff;
-
     font-size: 14px;
     font-weight: 800;
-
     letter-spacing: 0.5px;
-
-    box-shadow:
-        0 5px 15px rgba(23, 107, 91, 0.18);
+    box-shadow: 0 4px 12px rgba(23, 107, 91, 0.18);
 }
 
-.brand-text {
-    min-width: 0;
-}
+.brand-text min-width: 0;
 
 .brand-text h1 {
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.2;
-
     font-weight: 750;
-
     white-space: nowrap;
 }
 
 .brand-text span {
     display: block;
-
     margin-top: 2px;
-
     font-size: 11px;
-
     color: var(--text-muted);
-
-    letter-spacing: 0.3px;
 }
 
+/* Header Invoice Meta */
+.header-invoice-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--surface-soft);
+    padding: 6px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
 
-/* Header buttons */
+.header-invoice-info .meta-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--primary);
+    display: block;
+    letter-spacing: 1px;
+}
 
+.header-invoice-info .meta-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.invoice-number, .invoice-date {
+    display: flex;
+    flex-direction: column;
+}
+
+.invoice-number span, .invoice-date span {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.invoice-number strong, .invoice-date strong {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Header Buttons */
 .header-actions {
     display: flex;
     align-items: center;
@@ -200,26 +189,15 @@ select {
 }
 
 .header-btn {
-    height: 40px;
-
-    padding: 0 15px;
-
+    height: 38px;
+    padding: 0 14px;
     border: 1px solid var(--border);
-
     border-radius: var(--radius-sm);
-
     background: var(--surface);
-
     color: var(--text-secondary);
-
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 650;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
+    transition: 0.2s ease;
 }
 
 .header-btn:hover {
@@ -231,39 +209,66 @@ select {
 .header-btn.primary {
     background: var(--primary);
     color: #fff;
-
     border-color: var(--primary);
-
-    box-shadow:
-        0 4px 12px rgba(23, 107, 91, 0.18);
+    box-shadow: 0 4px 12px rgba(23, 107, 91, 0.18);
 }
 
 .header-btn.primary:hover {
     background: var(--primary-dark);
-
     color: #fff;
-
     transform: translateY(-1px);
+}
+
+/* Header Inline Customer Bar */
+.header-customer-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.header-form-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.header-form-group label {
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--text-secondary);
+}
+
+.header-form-group input,
+.header-form-group select {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+}
+
+.header-form-group input:focus,
+.header-form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
+    outline: none;
 }
 
 
 /* =========================================================
    3. MAIN LAYOUT
 ========================================================= */
-
 .app-container {
     width: min(1500px, calc(100% - 40px));
-
-    margin: 25px auto;
-
+    margin: 20px auto;
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        320px;
-
-    gap: 22px;
-
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
     align-items: start;
 }
 
@@ -271,270 +276,79 @@ select {
 /* =========================================================
    4. BILLING SECTION
 ========================================================= */
-
 .billing-section {
     min-width: 0;
-
     background: var(--surface);
-
     border: 1px solid var(--border);
-
     border-radius: var(--radius-lg);
-
     box-shadow: var(--shadow-sm);
-
+    padding-top: 20px;
     overflow: hidden;
 }
 
 
-/* Billing top */
-
-.billing-top {
-    padding: 23px 25px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 20px;
-
-    border-bottom: 1px solid var(--border);
-}
-
-.section-label {
-    display: block;
-
-    margin-bottom: 4px;
-
-    color: var(--primary);
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.3px;
-}
-
-.billing-top h2 {
-    font-size: 23px;
-
-    line-height: 1.2;
-
-    font-weight: 750;
-}
-
-
-/* Invoice information */
-
-.invoice-info {
-    display: flex;
-    align-items: center;
-
-    gap: 25px;
-}
-
-.invoice-info > div {
-    display: flex;
-    flex-direction: column;
-
-    gap: 2px;
-}
-
-.invoice-info span {
-    font-size: 10px;
-
-    color: var(--text-muted);
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.7px;
-}
-
-.invoice-info strong {
-    font-size: 13px;
-
-    font-weight: 700;
-}
-
-
 /* =========================================================
-   5. CUSTOMER CARD
+   5. PRODUCT SEARCH
 ========================================================= */
-
-.customer-card {
-    margin: 20px 25px;
-
-    padding: 18px;
-
-    background: var(--surface-soft);
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-md);
-
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr
-        180px;
-
-    gap: 15px;
+.product-search-section {
+    padding: 0 20px 16px;
+    position: relative;
 }
 
-
-/* Form */
-
-.form-group {
-    min-width: 0;
-}
-
-.form-group label,
 .product-search-section > label {
     display: block;
-
-    margin-bottom: 7px;
-
+    margin-bottom: 6px;
     color: var(--text-secondary);
-
     font-size: 11px;
-
     font-weight: 700;
-
-    letter-spacing: 0.2px;
-}
-
-.form-group input,
-.form-group select {
-    height: 42px;
-
-    padding: 0 12px;
-
-    border: 1px solid var(--border);
-
-    border-radius: var(--radius-sm);
-
-    background: var(--surface);
-
-    color: var(--text);
-
-    font-size: 13px;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.form-group input::placeholder {
-    color: #b0b7b5;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: var(--primary);
-
-    box-shadow:
-        0 0 0 3px rgba(23, 107, 91, 0.08);
-
-    outline: none;
-}
-
-
-/* =========================================================
-   6. PRODUCT SEARCH
-========================================================= */
-
-.product-search-section {
-    padding: 0 25px 20px;
-
-    position: relative;
 }
 
 .search-wrapper {
-    height: 48px;
-
+    height: 46px;
     position: relative;
-
     display: flex;
     align-items: center;
 }
 
 .search-icon {
     position: absolute;
-
-    left: 15px;
-
+    left: 14px;
     z-index: 2;
-
     color: var(--text-muted);
-
-    font-size: 21px;
-
-    line-height: 1;
-
+    font-size: 20px;
     pointer-events: none;
 }
 
 .search-wrapper input {
     width: 100%;
     height: 100%;
-
-    padding:
-        0 90px
-        0 43px;
-
+    padding: 0 90px 0 42px;
     border: 1px solid #ccd7d4;
-
-    border-radius: 11px;
-
+    border-radius: 10px;
     background: #fff;
-
     color: var(--text);
-
     font-size: 13px;
-
-    box-shadow:
-        0 2px 7px rgba(25, 40, 36, 0.03);
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    box-shadow: 0 2px 7px rgba(25, 40, 36, 0.03);
+    transition: 0.2s ease;
 }
 
 .search-wrapper input:focus {
     outline: none;
-
     border-color: var(--primary);
-
-    box-shadow:
-        0 0 0 3px rgba(23, 107, 91, 0.08);
-}
-
-.search-wrapper input::placeholder {
-    color: #a6afac;
+    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
 }
 
 .scan-btn {
     position: absolute;
-
-    right: 7px;
-
+    right: 6px;
     height: 34px;
-
-    padding: 0 13px;
-
+    padding: 0 12px;
     border: 0;
-
-    border-radius: 7px;
-
+    border-radius: 6px;
     background: var(--primary-light);
-
     color: var(--primary);
-
     font-size: 11px;
-
     font-weight: 750;
-
     transition: 0.2s ease;
 }
 
@@ -542,53 +356,33 @@ select {
     background: #dceee8;
 }
 
-
-/* Search results */
-
 .search-results {
     position: absolute;
-
-    left: 25px;
-    right: 25px;
-
-    top: calc(100% - 12px);
-
+    left: 20px;
+    right: 20px;
+    top: calc(100% - 10px);
     z-index: 50;
-
     display: none;
-
     background: #fff;
-
     border: 1px solid var(--border);
-
     border-radius: 10px;
-
     box-shadow: var(--shadow-md);
-
     overflow: hidden;
 }
 
 
 /* =========================================================
-   7. BILL ITEMS
+   6. BILL ITEMS TABLE & SCROLLBAR
 ========================================================= */
-
 .bill-items-card {
-    margin: 0 25px;
-
+    margin: 0 20px;
     border: 1px solid var(--border);
-
     border-radius: var(--radius-md);
-
     overflow: hidden;
 }
-
-/* =========================================================
-   TABLE HEADER & INLINE SEARCH
-========================================================= */
 
 .table-header {
-    min-height: 54px;
+    min-height: 50px;
     padding: 8px 16px;
     display: flex;
     align-items: center;
@@ -598,53 +392,30 @@ select {
     border-bottom: 1px solid var(--border);
 }
 
-/* Inline Search Input */
 .table-search-wrapper {
     flex: 1;
-    max-width: 260px;
+    max-width: 240px;
 }
 
 .table-search-wrapper input {
-    height: 34px;
-    padding: 0 12px;
+    height: 32px;
+    padding: 0 10px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--surface);
-    color: var(--text);
-    font-size: 12px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-size: 11px;
 }
-
-.table-search-wrapper input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
-}
-
-.table-search-wrapper input::placeholder {
-    color: var(--text-muted);
-}
-
-
-/* =========================================================
-   TABLE CONTAINER SCROLLBAR
-========================================================= */
 
 .table-container {
     width: 100%;
-    max-height: 420px; /* Limits table height (~6-7 items visible) */
-    overflow-y: auto;   /* Adds vertical scrollbar when items exceed max-height */
-    overflow-x: auto;   /* Keeps horizontal scrollbar for mobile responsiveness */
+    max-height: 440px;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
-/* Custom Scrollbar Styling for Table Container */
 .table-container::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-}
-
-.table-container::-webkit-scrollbar-track {
-    background: var(--surface-soft);
 }
 
 .table-container::-webkit-scrollbar-thumb {
@@ -652,120 +423,59 @@ select {
     border-radius: 4px;
 }
 
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
-
 .bill-table {
     width: 100%;
-
     border-collapse: collapse;
-
-    min-width: 700px;
+    min-width: 680px;
 }
 
 .bill-table th {
-    height: 39px;
-
+    height: 38px;
     padding: 0 12px;
-
     background: #fbfcfc;
-
     border-bottom: 1px solid var(--border);
-
     color: var(--text-muted);
-
     font-size: 9px;
-
     font-weight: 800;
-
     text-transform: uppercase;
-
-    letter-spacing: 0.5px;
-
     text-align: left;
 }
 
 .bill-table td {
-    padding: 12px;
-
+    padding: 10px 12px;
     border-bottom: 1px solid #eef1f0;
-
     color: var(--text);
-
     font-size: 12px;
-
     vertical-align: middle;
 }
 
-.bill-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.bill-table tbody tr:hover:not(.empty-bill) {
-    background: #fcfdfd;
-}
-
-
-/* Empty state */
-
-.empty-bill td {
-    padding: 0;
-}
-
 .empty-state {
-    padding: 42px 20px;
-
+    padding: 36px 20px;
     text-align: center;
 }
 
 .empty-icon {
-    width: 46px;
-    height: 46px;
-
-    margin: 0 auto 10px;
-
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 50%;
-
     background: var(--primary-light);
-
     font-size: 20px;
-}
-
-.empty-state h4 {
-    margin-bottom: 3px;
-
-    font-size: 13px;
-
-    font-weight: 700;
-}
-
-.empty-state p {
-    color: var(--text-muted);
-
-    font-size: 11px;
 }
 
 
 /* =========================================================
-   8. BILL SUMMARY
+   7. BILL SUMMARY & BANNER
 ========================================================= */
-
 .bill-summary {
-    width: min(380px, calc(100% - 50px));
-
-    margin: 20px 25px 0 auto;
-
-    padding: 18px;
-
+    width: min(400px, calc(100% - 40px));
+    margin: 20px 20px 0 auto;
+    padding: 16px;
     background: var(--surface-soft);
-
     border: 1px solid var(--border);
-
     border-radius: var(--radius-md);
 }
 
@@ -773,21 +483,16 @@ select {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    gap: 20px;
-
-    padding: 6px 0;
+    padding: 5px 0;
 }
 
 .summary-row span {
     color: var(--text-secondary);
-
     font-size: 12px;
 }
 
 .summary-row strong {
     font-size: 13px;
-
     font-weight: 750;
 }
 
@@ -797,362 +502,171 @@ select {
 
 .summary-divider {
     height: 1px;
-
     margin: 8px 0;
-
     background: var(--border);
 }
 
-.summary-row.grand-total {
-    padding-top: 9px;
-}
-
-.grand-total span {
-    color: var(--text);
-
+.summary-row.total-row span {
     font-size: 14px;
-
     font-weight: 750;
 }
 
-.grand-total strong {
-    color: var(--primary);
-
-    font-size: 21px;
-
+.summary-row.total-row span:last-child {
+    font-size: 20px;
     font-weight: 800;
+    color: var(--primary);
+}
+
+/* FULL LENGTH BANNER STYLES */
+.bill-savings-banner {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #eefaf6;
+    border-top: 2px dashed #176b5b;
+    border-bottom: 2px dashed #176b5b;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.bill-savings-banner .savings-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: #176b5b;
+    margin: 0 0 3px 0;
+}
+
+.bill-savings-banner .thank-you-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
 }
 
 
 /* =========================================================
-   9. BILL ACTIONS
+   8. BILL ACTIONS
 ========================================================= */
-
 .bill-actions {
-    padding: 20px 25px 25px;
-
+    padding: 18px 20px 20px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-
-    gap: 9px;
+    gap: 8px;
 }
 
 .btn {
-    min-height: 41px;
-
+    min-height: 40px;
     padding: 0 16px;
-
     border-radius: var(--radius-sm);
-
     border: 1px solid var(--border);
-
     font-size: 12px;
-
     font-weight: 700;
-
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: 0.2s ease;
 }
 
 .btn.secondary {
     background: #fff;
-
     color: var(--text-secondary);
 }
 
 .btn.secondary:hover {
     background: var(--surface-soft);
-
-    color: var(--text);
-
-    transform: translateY(-1px);
 }
 
 .btn.primary {
     background: var(--primary);
-
     border-color: var(--primary);
-
     color: #fff;
-
-    box-shadow:
-        0 4px 12px rgba(23, 107, 91, 0.16);
+    box-shadow: 0 4px 12px rgba(23, 107, 91, 0.16);
 }
 
 .btn.primary:hover {
     background: var(--primary-dark);
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 6px 15px rgba(23, 107, 91, 0.22);
-}
-
-.btn.large {
-    min-width: 125px;
 }
 
 
 /* =========================================================
-   10. RIGHT SIDEBAR
+   9. SIDEBAR & MODAL
 ========================================================= */
-
 .billing-sidebar {
     display: flex;
-
     flex-direction: column;
-
     gap: 16px;
-
-    min-width: 0;
-
     position: sticky;
-
-    top: 98px;
+    top: 130px;
 }
 
-
-/* Dashboard card */
-
 .dashboard-card {
-    padding: 18px;
-
+    padding: 16px;
     background: var(--surface);
-
     border: 1px solid var(--border);
-
     border-radius: var(--radius-lg);
-
     box-shadow: var(--shadow-sm);
 }
 
 .card-heading {
     display: flex;
-    align-items: flex-start;
     justify-content: space-between;
-
-    gap: 10px;
 }
 
 .card-label {
-    display: block;
-
-    margin-bottom: 2px;
-
-    color: var(--text-muted);
-
     font-size: 9px;
-
     font-weight: 800;
-
-    letter-spacing: 1px;
+    color: var(--text-muted);
 }
-
-.card-heading h3 {
-    font-size: 15px;
-
-    font-weight: 750;
-}
-
-.card-icon {
-    width: 32px;
-    height: 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 9px;
-
-    background: var(--primary-light);
-
-    color: var(--primary);
-
-    font-size: 14px;
-
-    font-weight: 800;
-}
-
-
-/* Sales */
 
 .sales-amount {
-    margin-top: 18px;
-
-    color: var(--text);
-
-    font-size: 28px;
-
+    margin-top: 14px;
+    font-size: 26px;
     font-weight: 800;
-
-    letter-spacing: -0.5px;
 }
 
 .sales-details {
-    margin-top: 13px;
-
-    padding-top: 13px;
-
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
-
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
 }
-
-.sales-details div {
-    display: flex;
-    flex-direction: column;
-
-    gap: 1px;
-}
-
-.sales-details span {
-    color: var(--text-muted);
-
-    font-size: 10px;
-}
-
-.sales-details strong {
-    font-size: 13px;
-
-    font-weight: 750;
-}
-
-
-/* =========================================================
-   11. QUICK ACTIONS
-========================================================= */
 
 .quick-actions {
-    margin-top: 14px;
-
+    margin-top: 12px;
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
     gap: 8px;
 }
 
 .quick-actions button {
-    min-height: 76px;
-
-    padding: 10px;
-
+    min-height: 68px;
+    padding: 8px;
     border: 1px solid var(--border);
-
-    border-radius: 10px;
-
+    border-radius: 8px;
     background: var(--surface-soft);
-
-    color: var(--text-secondary);
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    justify-content: space-between;
-
-    gap: 5px;
-
-    text-align: left;
-
     font-size: 10px;
-
     font-weight: 700;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.quick-actions button span {
-    font-size: 18px;
-
-    color: var(--primary);
-}
-
-.quick-actions button:hover {
-    background: var(--primary-light);
-
-    border-color: #c9e0d9;
-
-    color: var(--primary);
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   12. STOCK STATUS
-========================================================= */
-
-.stock-status {
-    margin-top: 14px;
-
     display: flex;
-
     flex-direction: column;
+    justify-content: space-between;
 }
 
 .stock-row {
-    padding: 10px 0;
-
+    padding: 8px 0;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-
     border-bottom: 1px solid #edf0ef;
 }
 
-.stock-row:last-child {
-    border-bottom: 0;
-
-    padding-bottom: 0;
-}
-
-.stock-row span {
-    color: var(--text-secondary);
-
-    font-size: 11px;
-}
-
-.stock-row strong {
-    font-size: 13px;
-
-    font-weight: 750;
-}
-
-
-/* =========================================================
-   13. MODAL
-========================================================= */
-
+/* Modal */
 .modal-overlay {
     position: fixed;
-
     inset: 0;
-
     z-index: 1000;
-
     padding: 20px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     background: rgba(18, 30, 27, 0.45);
-
     backdrop-filter: blur(4px);
 }
 
@@ -1161,483 +675,59 @@ select {
 }
 
 .modal {
-    width: min(520px, 100%);
-
-    max-height: calc(100vh - 40px);
-
-    overflow-y: auto;
-
+    width: min(500px, 100%);
     background: var(--surface);
-
     border-radius: var(--radius-lg);
-
-    box-shadow:
-        0 25px 70px rgba(15, 30, 26, 0.22);
+    box-shadow: 0 25px 70px rgba(15, 30, 26, 0.22);
 }
 
 .modal-header {
-    padding: 20px 22px;
-
+    padding: 18px 20px;
     display: flex;
-    align-items: flex-start;
     justify-content: space-between;
-
     border-bottom: 1px solid var(--border);
 }
 
-.modal-header h2 {
-    font-size: 20px;
-
-    font-weight: 750;
-}
-
 .modal-close {
-    width: 34px;
-    height: 34px;
-
     border: 0;
-
-    border-radius: 8px;
-
-    background: var(--surface-soft);
-
-    color: var(--text-secondary);
-
+    background: transparent;
     font-size: 22px;
-
-    line-height: 1;
-
-    transition: 0.2s ease;
-}
-
-.modal-close:hover {
-    background: var(--danger-light);
-
-    color: var(--danger);
 }
 
 #productForm {
-    padding: 22px;
-}
-
-#productForm .form-group {
-    margin-bottom: 16px;
+    padding: 20px;
 }
 
 .form-row {
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
-    gap: 14px;
+    gap: 12px;
 }
 
 .form-actions {
-    padding-top: 7px;
-
+    padding-top: 10px;
     display: flex;
-
     justify-content: flex-end;
-
-    gap: 9px;
+    gap: 8px;
 }
 
 
 /* =========================================================
-   14. RESPONSIVE — LARGE TABLETS / SMALL DESKTOP
+   10. MEDIA QUERIES & PRINT OVERRIDES
 ========================================================= */
-
-@media (max-width: 1100px) {
-
-    .app-container {
-        grid-template-columns:
-            minmax(0, 1fr)
-            280px;
-
-        width: min(100% - 30px, 1200px);
-
-        gap: 16px;
-    }
-
-    .app-header {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
-    .customer-card {
-        grid-template-columns:
-            1fr
-            1fr;
-    }
-
-    .customer-card .form-group:last-child {
-        grid-column: 1 / -1;
-    }
-
-}
-
-
-/* =========================================================
-   15. RESPONSIVE — TABLET
-========================================================= */
-
 @media (max-width: 850px) {
-
-    .app-header {
-        min-height: auto;
-
-        padding: 13px 16px;
-
+    .header-top-row {
         flex-wrap: wrap;
     }
-
-    .header-actions {
-        width: 100%;
-    }
-
-    .header-btn {
-        flex: 1;
-    }
-
-    .app-container {
-        width: calc(100% - 24px);
-
-        margin: 14px auto;
-
-        grid-template-columns: 1fr;
-    }
-
-    .billing-sidebar {
-        position: static;
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        align-items: start;
-    }
-
-    .dashboard-card:first-child {
-        grid-column: 1 / -1;
-    }
-
-}
-
-
-/* =========================================================
-   16. RESPONSIVE — MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-
-    body {
-        background: #f7f8f8;
-    }
-
-
-    /* Header */
-
-    .app-header {
-        padding: 11px 13px;
-
-        gap: 11px;
-    }
-
-    .brand-icon {
-        width: 38px;
-        height: 38px;
-
-        border-radius: 10px;
-
-        font-size: 12px;
-    }
-
-    .brand-text h1 {
-        font-size: 14px;
-    }
-
-    .brand-text span {
-        font-size: 9px;
-    }
-
-    .header-actions {
-        gap: 6px;
-    }
-
-    .header-btn {
-        height: 37px;
-
-        padding: 0 8px;
-
-        font-size: 10px;
-    }
-
-
-    /* Main */
-
-    .app-container {
-        width: 100%;
-
-        margin: 0;
-
-        gap: 10px;
-    }
-
-    .billing-section {
-        border-radius: 0;
-
-        border-left: 0;
-        border-right: 0;
-    }
-
-
-    /* Billing top */
-
-    .billing-top {
-        padding: 18px 15px;
-
-        align-items: flex-start;
-    }
-
-    .billing-top h2 {
-        font-size: 19px;
-    }
-
-    .invoice-info {
-        gap: 12px;
-
-        text-align: right;
-    }
-
-    .invoice-info strong {
-        font-size: 11px;
-    }
-
-
-    /* Customer */
-
-    .customer-card {
-        margin: 14px 15px;
-
-        padding: 13px;
-
-        grid-template-columns: 1fr;
-
-        gap: 12px;
-    }
-
-    .customer-card .form-group:last-child {
-        grid-column: auto;
-    }
-
-
-    /* Search */
-
-    .product-search-section {
-        padding:
-            0 15px 15px;
-    }
-
-    .search-wrapper input {
-        font-size: 12px;
-    }
-
-    .search-results {
-        left: 15px;
-        right: 15px;
-    }
-
-
-    /* Table */
-
-    .bill-items-card {
-        margin: 0 15px;
-
-        border-radius: 10px;
-    }
-
-    .bill-table {
-        min-width: 680px;
-    }
-
-
-    /* Summary */
-
-    .bill-summary {
-        width: auto;
-
-        margin:
-            15px 15px 0;
-    }
-
-
-    /* Actions */
-
-    .bill-actions {
-        padding:
-            15px;
-
-        display: grid;
-
-        grid-template-columns:
-            1fr 1fr;
-    }
-
-    .bill-actions .btn {
-        width: 100%;
-    }
-
-    .bill-actions .btn.large {
-        grid-column: 1 / -1;
-
-        order: -1;
-
-        min-height: 46px;
-    }
-
-
-    /* Sidebar */
-
-    .billing-sidebar {
-        padding: 0 10px 15px;
-
-        grid-template-columns: 1fr;
-
-        gap: 10px;
-    }
-
-    .dashboard-card:first-child {
-        grid-column: auto;
-    }
-
-
-    /* Modal */
-
-    .modal-overlay {
-        padding: 10px;
-
-        align-items: flex-end;
-    }
-
-    .modal {
-        max-height: 90vh;
-
-        border-radius:
-            18px 18px 10px 10px;
-    }
-
-    .modal-header {
-        padding: 17px;
-    }
-
-    #productForm {
-        padding: 17px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-
-        gap: 0;
-    }
-
-}
-
-
-/* =========================================================
-   17. VERY SMALL PHONES
-========================================================= */
-
-@media (max-width: 380px) {
-
-    .brand-text h1 {
-        font-size: 13px;
-    }
-
-    .header-btn {
-        padding: 0 6px;
-
-        font-size: 9px;
-    }
-
-    .billing-top {
+    .header-customer-bar {
         flex-direction: column;
     }
-
-    .invoice-info {
-        width: 100%;
-
-        justify-content: space-between;
-
-        text-align: left;
-    }
-
-    .bill-actions {
+    .app-container {
         grid-template-columns: 1fr;
     }
-
-    .bill-actions .btn.large {
-        grid-column: auto;
-
-        order: -1;
-    }
-
 }
 
-
-/* =========================================================
-   18. PRINT
-========================================================= */
-
 @media print {
-
-    body {
-        background: #fff;
-    }
-
-    .app-header,
-    .billing-sidebar,
-    .product-search-section,
-    .bill-actions,
-    .customer-card {
-        display: none !important;
-    }
-
-    .app-container {
-        width: 100%;
-
-        margin: 0;
-
-        display: block;
-    }
-
-    .billing-section {
-        border: 0;
-
-        box-shadow: none;
-
-        border-radius: 0;
-    }
-
-    .billing-top {
-        border-bottom: 1px solid #ddd;
-    }
-
-    .bill-items-card {
-        margin: 20px 0;
-    }
-
-    .bill-summary {
-        margin-right: 0;
-    }
-
-}
-
-/* =========================================================
-   PRINT & PDF LAYOUT OVERRIDES
-========================================================= */
-@media print {
-    /* 1. Reset full page layout and scrolling */
     html, body {
         height: auto !important;
         overflow: visible !important;
@@ -1645,20 +735,12 @@ select {
         color: #000 !important;
     }
 
-    /* 2. Hide interactive app UI elements during print */
-    button, 
-    .quantity-btn, 
-    .remove-item, 
-    .product-search-section, 
-    .table-search-wrapper,
-    .app-header, 
-    .action-buttons,
-    #scanBtn,
-    #clearBillBtn {
+    button, .quantity-btn, .remove-item, 
+    .product-search-section, .table-search-wrapper, 
+    .app-header, .bill-actions, .billing-sidebar {
         display: none !important;
     }
 
-    /* 3. Force table container to expand fully without scrolling */
     .table-container {
         max-height: none !important;
         height: auto !important;
@@ -1666,11 +748,11 @@ select {
         border: none !important;
     }
 
-    /* 4. Formatting for table rendering */
-    .bill-items-card {
+    .bill-items-card, .billing-section {
         box-shadow: none !important;
         border: none !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
 
     table {
@@ -1680,48 +762,8 @@ select {
 
     tr {
         page-break-inside: avoid;
-        page-break-after: auto;
     }
 
-    /* 5. Clean up display for QTY numbers when buttons are hidden */
-    td strong {
-        display: inline-block !important;
-    }
-}
-
-
-
-/* =========================================================
-   FULL LENGTH SAVINGS & THANK YOU BANNER
-========================================================= */
-
-.bill-savings-banner {
-    width: 100%;                  /* Full width from left to right */
-    margin-top: 16px;
-    padding: 14px 16px;
-    background: #eefaf6;
-    border-top: 2px dashed #176b5b;  /* Clean full divider line above banner */
-    border-bottom: 2px dashed #176b5b;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.bill-savings-banner .savings-text {
-    font-size: 15px;
-    font-weight: 800;
-    color: #176b5b;
-    margin: 0 0 4px 0;
-}
-
-.bill-savings-banner .thank-you-text {
-    font-size: 12px;
-    font-weight: 600;
-    color: #2d3748;
-    margin: 0;
-}
-
-/* Print/PDF Override for Full Length Banner */
-@media print {
     .bill-savings-banner {
         display: block !important;
         width: 100% !important;
