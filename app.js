@@ -1554,9 +1554,346 @@ function updateSalesDashboard() {
 
 function importExcel() {
 
-    alert(
-        "Excel import is the next major feature. We will connect your grocery Excel file here."
+    /* Check whether Excel library is available */
+
+    if (typeof XLSX === "undefined") {
+
+        alert(
+            "Excel import library could not be loaded. Please check your internet connection and reload the page."
+        );
+
+        return;
+
+    }
+
+
+    /* Create hidden file input */
+
+    const fileInput =
+        document.createElement("input");
+
+    fileInput.type = "file";
+
+    fileInput.accept =
+        ".xlsx,.xls";
+
+    fileInput.style.display = "none";
+
+
+    /* When a file is selected */
+
+    fileInput.addEventListener(
+        "change",
+        handleExcelFile
     );
+
+
+    document.body.appendChild(fileInput);
+
+    fileInput.click();
+
+
+    /* Remove temporary input */
+
+    setTimeout(() => {
+
+        fileInput.remove();
+
+    }, 1000);
+
+}
+
+
+/* =========================================================
+   EXCEL FILE PROCESSING
+========================================================= */
+
+function handleExcelFile(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = function (excelEvent) {
+
+        try {
+
+            const data =
+                new Uint8Array(
+                    excelEvent.target.result
+                );
+
+
+            const workbook =
+                XLSX.read(
+                    data,
+                    {
+                        type: "array"
+                    }
+                );
+
+
+            /* Use the first worksheet */
+
+            const firstSheetName =
+                workbook.SheetNames[0];
+
+
+            const worksheet =
+                workbook.Sheets[
+                    firstSheetName
+                ];
+
+
+            /* Convert Excel rows into objects */
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    worksheet,
+                    {
+                        defval: ""
+                    }
+                );
+
+
+            if (rows.length === 0) {
+
+                alert(
+                    "The Excel file is empty."
+                );
+
+                return;
+
+            }
+
+
+            const importedProducts = [];
+
+            const errors = [];
+
+
+            rows.forEach(
+                (row, index) => {
+
+                    const rowNumber =
+                        index + 2;
+
+
+                    const id =
+                        String(
+                            row["Item Code"]
+                        ).trim();
+
+
+                    const name =
+                        String(
+                            row["Item Name"]
+                        ).trim();
+
+
+                    const category =
+                        String(
+                            row["Category"]
+                        ).trim();
+
+
+                    const unit =
+                        String(
+                            row["Unit"]
+                        ).trim();
+
+
+                    const mrp =
+                        Number(
+                            row["MRP"]
+                        );
+
+
+                    const salePrice =
+                        Number(
+                            row["Sale Price"]
+                        );
+
+
+                    /* Validate required fields */
+
+                    if (
+                        !id ||
+                        !name ||
+                        !unit ||
+                        isNaN(mrp) ||
+                        isNaN(salePrice)
+                    ) {
+
+                        errors.push(
+                            `Row ${rowNumber}: Missing or invalid data`
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (mrp < 0 || salePrice < 0) {
+
+                        errors.push(
+                            `Row ${rowNumber}: Price cannot be negative`
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (salePrice > mrp) {
+
+                        errors.push(
+                            `Row ${rowNumber}: Sale Price cannot be higher than MRP`
+                        );
+
+                        return;
+
+                    }
+
+
+                    importedProducts.push({
+
+                        id: id,
+
+                        name: name,
+
+                        mrp: mrp,
+
+                        salePrice: salePrice,
+
+                        unit: unit,
+
+                        category:
+                            category ||
+                            "General"
+
+                    });
+
+                }
+            );
+
+
+            /* Stop if nothing valid was imported */
+
+            if (
+                importedProducts.length === 0
+            ) {
+
+                alert(
+                    "No valid products were found in the Excel file."
+                );
+
+                return;
+
+            }
+
+
+            /* Ask before replacing existing products */
+
+            const confirmed =
+                confirm(
+                    `Found ${importedProducts.length} valid products.\n\n` +
+                    `Importing this Excel file will replace the current product list.\n\n` +
+                    `Do you want to continue?`
+                );
+
+
+            if (!confirmed) {
+
+                return;
+
+            }
+
+
+            /* Replace product database */
+
+            products =
+                importedProducts;
+
+
+            /* Save imported products */
+
+            saveProducts();
+
+
+            /* Update dashboard */
+
+            updateInventoryStats();
+
+
+            /* Clear current search */
+
+            productSearch.value = "";
+
+            hideSearchResults();
+
+
+            /* Show result */
+
+            let message =
+                `Successfully imported ${importedProducts.length} products.`;
+
+
+            if (errors.length > 0) {
+
+                message +=
+                    `\n\n${errors.length} row(s) were skipped because of errors.`;
+
+            }
+
+
+            alert(message);
+
+
+            console.log(
+                "Imported products:",
+                products
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Excel import error:",
+                error
+            );
+
+
+            alert(
+                "Unable to read this Excel file. Please make sure you are using the correct Excel template."
+            );
+
+        }
+
+    };
+
+
+    reader.onerror = function () {
+
+        alert(
+            "Could not read the selected Excel file."
+        );
+
+    };
+
+
+    reader.readAsArrayBuffer(file);
 
 }
 
