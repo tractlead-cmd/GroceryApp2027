@@ -45,9 +45,9 @@
             </div>
 
             <div class="header-actions">
-                <button class="header-btn" id="productsBtn">Products</button>
-                <button class="header-btn" id="salesBtn">Sales</button>
-                <button class="header-btn primary" id="newBillBtn">+ New Bill</button>
+                <button type="button" class="header-btn" id="productsBtn">Products</button>
+                <button type="button" class="header-btn" id="salesBtn">Sales</button>
+                <button type="button" class="header-btn primary" id="newBillBtn">+ New Bill</button>
             </div>
         </div>
 
@@ -60,6 +60,7 @@
                     id="customerPhone"
                     placeholder="Enter phone number"
                     maxlength="10"
+                    pattern="[0-9]{10}"
                 >
             </div>
 
@@ -96,13 +97,13 @@
         <section class="billing-section">
 
             <!-- ==================================
-                 PRODUCT SEARCH (NOW RIGHT AT THE TOP)
+                 PRODUCT SEARCH
             =================================== -->
             <div class="product-search-section">
                 <label for="productSearch">Add Products</label>
 
                 <div class="search-wrapper">
-                    <span class="search-icon">⌕</span>
+                    <span class="search-icon" aria-hidden="true">⌕</span>
                     <input
                         type="text"
                         id="productSearch"
@@ -115,7 +116,7 @@
                 </div>
 
                 <!-- Search results container -->
-                <div class="search-results" id="searchResults"></div>
+                <div class="search-results" id="searchResults" role="region" aria-live="polite"></div>
             </div>
 
 
@@ -128,6 +129,7 @@
 
                     <!-- Search input inside table header -->
                     <div class="table-search-wrapper">
+                        <label for="billedItemsSearch" class="sr-only">Search items in bill</label>
                         <input 
                             type="text" 
                             id="billedItemsSearch" 
@@ -143,13 +145,13 @@
                     <table class="bill-table">
                         <thead>
                             <tr>
-                                <th>Product</th>
-                                <th>Qty</th>
-                                <th>MRP</th>
-                                <th>Sale Price</th>
-                                <th>Discount</th>
-                                <th>Amount</th>
-                                <th></th>
+                                <th scope="col">Product</th>
+                                <th scope="col">Qty</th>
+                                <th scope="col">MRP</th>
+                                <th scope="col">Sale Price</th>
+                                <th scope="col">Discount</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col"><span class="sr-only">Actions</span></th>
                             </tr>
                         </thead>
 
@@ -235,7 +237,7 @@
                         <span class="card-label">TODAY</span>
                         <h3>Sales</h3>
                     </div>
-                    <span class="card-icon">₹</span>
+                    <span class="card-icon" aria-hidden="true">₹</span>
                 </div>
 
                 <div class="sales-amount" id="todaySales">₹0</div>
@@ -264,19 +266,19 @@
 
                 <div class="quick-actions">
                     <button type="button" id="addProductBtn">
-                        <span>＋</span> Add Product
+                        <span aria-hidden="true">＋</span> Add Product
                     </button>
 
                     <button type="button" id="importExcelBtn">
-                        <span>⇧</span> Import Excel
+                        <span aria-hidden="true">⇧</span> Import Excel
                     </button>
 
                     <button type="button" id="viewSalesBtn">
-                        <span>▤</span> View Sales
+                        <span aria-hidden="true">▤</span> View Sales
                     </button>
 
                     <button type="button" id="settingsBtn">
-                        <span>⚙</span> Settings
+                        <span aria-hidden="true">⚙</span> Settings
                     </button>
                 </div>
             </div>
@@ -317,14 +319,14 @@
     <!-- ==========================================
          PRODUCT MODAL
     =========================================== -->
-    <div class="modal-overlay" id="productModal" hidden>
+    <div class="modal-overlay" id="productModal" hidden aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
         <div class="modal">
             <div class="modal-header">
                 <div>
                     <span class="section-label">PRODUCT</span>
-                    <h2>Add Product</h2>
+                    <h2 id="modalTitle">Add Product</h2>
                 </div>
-                <button type="button" class="modal-close" id="closeProductModal">
+                <button type="button" class="modal-close" id="closeProductModal" aria-label="Close modal">
                     ×
                 </button>
             </div>
