@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let currentBill = [];
-    let selectedIndex = -1; // Index for keyboard navigation
+    let selectedIndex = -1; // Index for search navigation
 
     // DOM Elements
     const productSearchInput = document.getElementById('productSearch');
@@ -26,13 +26,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemCountEl = document.getElementById('itemCount');
     const invoiceDateEl = document.getElementById('invoiceDate');
     const themeToggleBtn = document.getElementById('themeToggleBtn');
-    
+
+    // Action Buttons
+    const addProductBtn = document.getElementById('addProductBtn');
+    const clearBillBtn = document.getElementById('clearBillBtn');
+    const printBillBtn = document.getElementById('printBillBtn');
+    const saveBillBtn = document.getElementById('saveBillBtn'); // Optional Save Button element
+    const importExcelBtn = document.getElementById('importExcelBtn');
+    const excelFileInput = document.getElementById('excelFileInput');
+
     // Modal Elements
     const productModal = document.getElementById('productModal');
-    const addProductBtn = document.getElementById('addProductBtn');
     const closeProductModal = document.getElementById('closeProductModal');
     const cancelProductBtn = document.getElementById('cancelProductBtn');
     const productForm = document.getElementById('productForm');
+    const modalProductList = document.getElementById('modalProductList');
 
     // Display Current Date
     if (invoiceDateEl) {
@@ -41,7 +49,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 1. THEME TOGGLE (DARK / LIGHT MODE)
+    // 1. GLOBAL KEYBOARD SHORTCUTS
+    // ==========================================
+    document.addEventListener('keydown', (e) => {
+        // Detect Ctrl key (or Cmd key on Mac)
+        const isCtrl = e.ctrlKey || e.metaKey;
+
+        if (isCtrl) {
+            const key = e.key.toLowerCase();
+
+            // Ctrl + S : Save / Checkout Bill
+            if (key === 's') {
+                e.preventDefault();
+                saveBillAction();
+            }
+            // Ctrl + Q : Clear Current Bill
+            else if (key === 'q') {
+                e.preventDefault();
+                clearBillAction();
+            }
+            // Ctrl + P : Print Bill
+            else if (key === 'p') {
+                e.preventDefault();
+                printBillAction();
+            }
+            // Ctrl + N : New Bill
+            else if (key === 'n') {
+                e.preventDefault();
+                newBillAction();
+            }
+        }
+    });
+
+    // Helper Action Functions for Shortcuts & Buttons
+    function saveBillAction() {
+        if (currentBill.length === 0) {
+            alert('Cannot save an empty bill. Add products first!');
+            return;
+        }
+        alert('Bill saved successfully!');
+        // Additional save logic (e.g., API call or storing sales history) can go here
+    }
+
+    function clearBillAction() {
+        if (currentBill.length > 0) {
+            if (confirm('Are you sure you want to clear the current bill? (Ctrl+Q)')) {
+                currentBill = [];
+                renderBill();
+            }
+        }
+    }
+
+    function printBillAction() {
+        if (currentBill.length === 0) {
+            alert('Add products to the bill before printing.');
+            return;
+        }
+        window.print();
+    }
+
+    function newBillAction() {
+        if (currentBill.length > 0) {
+            if (!confirm('Start a new bill? Current unsaved items will be cleared.')) {
+                return;
+            }
+        }
+        currentBill = [];
+        renderBill();
+        if (productSearchInput) {
+            productSearchInput.focus();
+        }
+    }
+
+    // Connect Action Buttons to Functions
+    if (clearBillBtn) clearBillBtn.addEventListener('click', clearBillAction);
+    if (printBillBtn) printBillBtn.addEventListener('click', printBillAction);
+    if (saveBillBtn) saveBillBtn.addEventListener('click', saveBillAction);
+
+    // ==========================================
+    // 2. THEME TOGGLE (DARK / LIGHT MODE)
     // ==========================================
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -73,21 +159,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 2. SEARCH & ARROW KEY NAVIGATION
+    // 3. SEARCH & ARROW KEY NAVIGATION
     // ==========================================
-    productSearchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        selectedIndex = -1; // Reset selection index
+    if (productSearchInput && searchResults) {
+        productSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim().toLowerCase();
+            selectedIndex = -1;
 
-        if (!query) {
-            searchResults.classList.remove('active');
-            searchResults.innerHTML = '';
-            return;
-        }
+            if (!query) {
+                searchResults.classList.remove('active');
+                searchResults.innerHTML = '';
+                return;
+            }
 
-        const matches = products.filter(p => p.name.toLowerCase().includes(query));
-        renderSearchResults(matches);
-    });
+            const matches = products.filter(p => p.name.toLowerCase().includes(query));
+            renderSearchResults(matches);
+        });
+
+        productSearchInput.addEventListener('keydown', (e) => {
+            const items = searchResults.querySelectorAll('.search-result-item');
+            if (!items.length || !searchResults.classList.contains('active')) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                updateSelection(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                updateSelection(items);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex > -1 && items[selectedIndex]) {
+                    items[selectedIndex].click();
+                }
+            } else if (e.key === 'Escape') {
+                closeSearchResults();
+            }
+        });
+    }
 
     function renderSearchResults(matches) {
         searchResults.innerHTML = '';
@@ -107,12 +217,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="item-meta">${product.category} · ${product.unit}</span>
                 </div>
                 <div class="item-price-block">
-                    <span class="item-price">₹${product.salePrice.toFixed(2)}</span>
-                    <span class="item-mrp">₹${product.mrp.toFixed(2)}</span>
+                    <span class="item-price">₹${Number(product.salePrice).toFixed(2)}</span>
+                    <span class="item-mrp">₹${Number(product.mrp).toFixed(2)}</span>
                 </div>
             `;
 
-            // Mouse Click Event
             item.addEventListener('click', () => {
                 addToBill(product);
                 closeSearchResults();
@@ -123,29 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         searchResults.classList.add('active');
     }
-
-    // Keyboard Arrow Keys Navigation Logic
-    productSearchInput.addEventListener('keydown', (e) => {
-        const items = searchResults.querySelectorAll('.search-result-item');
-        if (!items.length || !searchResults.classList.contains('active')) return;
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = (selectedIndex + 1) % items.length;
-            updateSelection(items);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-            updateSelection(items);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (selectedIndex > -1 && items[selectedIndex]) {
-                items[selectedIndex].click();
-            }
-        } else if (e.key === 'Escape') {
-            closeSearchResults();
-        }
-    });
 
     function updateSelection(items) {
         items.forEach((item, idx) => {
@@ -159,21 +245,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeSearchResults() {
+        if (!searchResults || !productSearchInput) return;
         searchResults.classList.remove('active');
         searchResults.innerHTML = '';
         productSearchInput.value = '';
         selectedIndex = -1;
     }
 
-    // Hide search results when clicking outside
     document.addEventListener('click', (e) => {
-        if (!searchResults.contains(e.target) && e.target !== productSearchInput) {
-            closeSearchResults();
+        if (searchResults && productSearchInput) {
+            if (!searchResults.contains(e.target) && e.target !== productSearchInput) {
+                closeSearchResults();
+            }
         }
     });
 
     // ==========================================
-    // 3. BILL MANAGEMENT
+    // 4. BILL MANAGEMENT
     // ==========================================
     function addToBill(product) {
         const existingItem = currentBill.find(item => item.id === product.id);
@@ -188,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderBill() {
+        if (!billItemsContainer) return;
         billItemsContainer.innerHTML = '';
 
         if (currentBill.length === 0) {
@@ -216,8 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
                     <input type="number" class="qty-input" min="1" value="${item.qty}" data-index="${index}">
                 </td>
-                <td>₹${item.mrp.toFixed(2)}</td>
-                <td>₹${item.salePrice.toFixed(2)}</td>
+                <td>₹${Number(item.mrp).toFixed(2)}</td>
+                <td>₹${Number(item.salePrice).toFixed(2)}</td>
                 <td style="color:var(--primary-color);">₹${discount.toFixed(2)}</td>
                 <td><strong>₹${amount.toFixed(2)}</strong></td>
                 <td><button type="button" class="btn-remove" data-index="${index}">×</button></td>
@@ -228,25 +317,26 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSummary();
     }
 
-    // Update Quantity & Delete Handlers
-    billItemsContainer.addEventListener('change', (e) => {
-        if (e.target.classList.contains('qty-input')) {
-            const index = e.target.dataset.index;
-            const newQty = parseInt(e.target.value, 10);
-            if (newQty > 0) {
-                currentBill[index].qty = newQty;
+    if (billItemsContainer) {
+        billItemsContainer.addEventListener('change', (e) => {
+            if (e.target.classList.contains('qty-input')) {
+                const index = e.target.dataset.index;
+                const newQty = parseInt(e.target.value, 10);
+                if (newQty > 0) {
+                    currentBill[index].qty = newQty;
+                    renderBill();
+                }
+            }
+        });
+
+        billItemsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-remove')) {
+                const index = e.target.dataset.index;
+                currentBill.splice(index, 1);
                 renderBill();
             }
-        }
-    });
-
-    billItemsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-remove')) {
-            const index = e.target.dataset.index;
-            currentBill.splice(index, 1);
-            renderBill();
-        }
-    });
+        });
+    }
 
     function updateSummary() {
         let totalMrp = 0;
@@ -261,30 +351,115 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalSavings = totalMrp - grandTotal;
 
-        totalMrpEl.textContent = `₹${totalMrp.toFixed(2)}`;
-        totalSavingsEl.textContent = `₹${totalSavings.toFixed(2)}`;
-        grandTotalEl.textContent = `₹${grandTotal.toFixed(2)}`;
-        itemCountEl.textContent = `${totalItems} Items`;
+        if (totalMrpEl) totalMrpEl.textContent = `₹${totalMrp.toFixed(2)}`;
+        if (totalSavingsEl) totalSavingsEl.textContent = `₹${totalSavings.toFixed(2)}`;
+        if (grandTotalEl) grandTotalEl.textContent = `₹${grandTotal.toFixed(2)}`;
+        if (itemCountEl) itemCountEl.textContent = `${totalItems} Items`;
     }
 
-    // Clear Bill Action
-    document.getElementById('clearBillBtn').addEventListener('click', () => {
-        if (currentBill.length > 0 && confirm('Are you sure you want to clear the current bill?')) {
-            currentBill = [];
-            renderBill();
-        }
-    });
-
     // ==========================================
-    // 4. ADD PRODUCT MODAL HANDLERS
+    // 5. IMPORT EXCEL / CSV HANDLING
     // ==========================================
-    if (addProductBtn) {
-        addProductBtn.addEventListener('click', () => {
-            productModal.removeAttribute('hidden');
+    if (importExcelBtn) {
+        importExcelBtn.addEventListener('click', () => {
+            if (excelFileInput) {
+                excelFileInput.click();
+            } else {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = '.csv, .json';
+                fileInput.onchange = (e) => handleFileUpload(e.target.files[0]);
+                fileInput.click();
+            }
         });
     }
 
-    const closeModal = () => productModal.setAttribute('hidden', 'true');
+    if (excelFileInput) {
+        excelFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+    }
+
+    function handleFileUpload(file) {
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const content = e.target.result;
+                let importedData = [];
+
+                if (file.name.endsWith('.json')) {
+                    importedData = JSON.parse(content);
+                } else {
+                    const lines = content.split('\n');
+                    lines.forEach((line, i) => {
+                        if (i === 0 || !line.trim()) return;
+                        const cols = line.split(',');
+                        if (cols.length >= 3) {
+                            importedData.push({
+                                id: Date.now() + i,
+                                name: cols[0].trim(),
+                                mrp: parseFloat(cols[1]) || 0,
+                                salePrice: parseFloat(cols[2]) || 0,
+                                category: cols[3] ? cols[3].trim() : 'General',
+                                unit: cols[4] ? cols[4].trim() : '1 Pcs'
+                            });
+                        }
+                    });
+                }
+
+                if (importedData.length > 0) {
+                    products = [...products, ...importedData];
+                    localStorage.setItem('products', JSON.stringify(products));
+                    alert(`Successfully imported ${importedData.length} products!`);
+                    renderModalProductList();
+                } else {
+                    alert('Could not find valid product data in file.');
+                }
+            } catch (err) {
+                alert('Error parsing file: ' + err.message);
+            }
+        };
+
+        reader.readAsText(file);
+    }
+
+    // ==========================================
+    // 6. ADD PRODUCT MODAL HANDLERS
+    // ==========================================
+    function renderModalProductList() {
+        if (!modalProductList) return;
+        modalProductList.innerHTML = products.map((p) => `
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <strong>${p.name}</strong> <small>(${p.unit})</small>
+                </div>
+                <div>
+                    <span style="color: var(--primary-color); font-weight: bold;">₹${Number(p.salePrice).toFixed(2)}</span>
+                    <small style="text-decoration: line-through; color: var(--text-muted);">₹${Number(p.mrp).toFixed(2)}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    if (addProductBtn && productModal) {
+        addProductBtn.addEventListener('click', () => {
+            renderModalProductList();
+            productModal.removeAttribute('hidden');
+            productModal.style.display = 'flex';
+        });
+    }
+
+    const closeModal = () => {
+        if (productModal) {
+            productModal.setAttribute('hidden', 'true');
+            productModal.style.display = 'none';
+        }
+    };
+
     if (closeProductModal) closeProductModal.addEventListener('click', closeModal);
     if (cancelProductBtn) cancelProductBtn.addEventListener('click', closeModal);
 
@@ -296,14 +471,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: document.getElementById('productName').value,
                 mrp: parseFloat(document.getElementById('productMrp').value),
                 salePrice: parseFloat(document.getElementById('productSalePrice').value),
-                unit: document.getElementById('productUnit').value,
-                category: document.getElementById('productCategory').value || 'General'
+                unit: document.getElementById('productUnit').value || '1 Unit',
+                category: document.getElementById('productCategory') ? document.getElementById('productCategory').value : 'General'
             };
 
             products.push(newProduct);
             localStorage.setItem('products', JSON.stringify(products));
             alert('Product added successfully!');
             productForm.reset();
+            renderModalProductList();
             closeModal();
         });
     }
