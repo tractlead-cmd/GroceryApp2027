@@ -1,11 +1,11 @@
 /* =========================================================
    SRI RAGHAVENDRA GROCERY
    BILLING & INVENTORY SYSTEM
-   Main Stylesheet
+   Main Stylesheet (Dark Mode Default + Dynamic Theme Switcher)
 ========================================================= */
 
 /* =========================================================
-   1. RESET & GLOBAL
+   1. RESET & VARIABLES (DARK MODE DEFAULT)
 ========================================================= */
 * {
     margin: 0;
@@ -13,7 +13,43 @@
     box-sizing: border-box;
 }
 
-:root {
+/* Default Theme Settings: DARK MODE */
+:root, [data-theme="dark"] {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --primary-light: rgba(16, 185, 129, 0.12);
+
+    --accent: #f59e0b;
+    --accent-light: rgba(245, 158, 11, 0.15);
+
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-soft: #334155;
+
+    --text: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+
+    --border: #334155;
+    --border-subtle: #475569;
+
+    --danger: #ef4444;
+    --danger-light: rgba(239, 68, 68, 0.15);
+
+    --success: #10b981;
+    --success-light: rgba(16, 185, 129, 0.15);
+
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 12px 36px rgba(0, 0, 0, 0.45);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+}
+
+/* Light Theme Variables */
+[data-theme="light"] {
     --primary: #176b5b;
     --primary-dark: #0f5145;
     --primary-light: #e8f5f1;
@@ -30,6 +66,8 @@
     --text-muted: #929b99;
 
     --border: #e4e9e7;
+    --border-subtle: #edf1f0;
+
     --danger: #d9534f;
     --danger-light: #fff0ef;
 
@@ -38,11 +76,6 @@
 
     --shadow-sm: 0 2px 8px rgba(25, 40, 36, 0.05);
     --shadow-md: 0 8px 30px rgba(25, 40, 36, 0.08);
-
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
 }
 
 html {
@@ -56,10 +89,12 @@ body {
     color: var(--text);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    transition: background 0.25s ease, color 0.25s ease;
 }
 
 button, input, select {
     font: inherit;
+    color: var(--text);
 }
 
 button {
@@ -69,7 +104,7 @@ button {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-    outline: 3px solid rgba(23, 107, 91, 0.18);
+    outline: 3px solid var(--primary);
     outline-offset: 2px;
 }
 
@@ -92,6 +127,8 @@ input, select {
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .header-top-row {
@@ -122,16 +159,19 @@ input, select {
     font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 12px rgba(23, 107, 91, 0.18);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
-.brand-text min-width: 0;
+.brand-text {
+    min-width: 0;
+}
 
 .brand-text h1 {
     font-size: 16px;
     line-height: 1.2;
     font-weight: 750;
     white-space: nowrap;
+    color: var(--text);
 }
 
 .brand-text span {
@@ -139,6 +179,32 @@ input, select {
     margin-top: 2px;
     font-size: 11px;
     color: var(--text-muted);
+}
+
+/* Theme Toggle Button Right Next To Title */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    padding: 4px 10px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface-soft);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 650;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.theme-icon {
+    font-size: 12px;
 }
 
 /* Header Invoice Meta */
@@ -203,14 +269,14 @@ input, select {
 .header-btn:hover {
     background: var(--surface-soft);
     color: var(--primary);
-    border-color: #cbd9d5;
+    border-color: var(--primary);
 }
 
 .header-btn.primary {
     background: var(--primary);
     color: #fff;
     border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(23, 107, 91, 0.18);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .header-btn.primary:hover {
@@ -249,13 +315,14 @@ input, select {
     font-size: 12px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    background: var(--surface);
+    background: var(--surface-soft);
+    color: var(--text);
 }
 
 .header-form-group input:focus,
 .header-form-group select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
+    box-shadow: 0 0 0 3px var(--primary-light);
     outline: none;
 }
 
@@ -323,19 +390,19 @@ input, select {
     width: 100%;
     height: 100%;
     padding: 0 90px 0 42px;
-    border: 1px solid #ccd7d4;
+    border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fff;
+    background: var(--surface-soft);
     color: var(--text);
     font-size: 13px;
-    box-shadow: 0 2px 7px rgba(25, 40, 36, 0.03);
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.1);
     transition: 0.2s ease;
 }
 
 .search-wrapper input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .scan-btn {
@@ -353,7 +420,8 @@ input, select {
 }
 
 .scan-btn:hover {
-    background: #dceee8;
+    background: var(--primary);
+    color: #fff;
 }
 
 .search-results {
@@ -363,7 +431,7 @@ input, select {
     top: calc(100% - 10px);
     z-index: 50;
     display: none;
-    background: #fff;
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     box-shadow: var(--shadow-md);
@@ -403,6 +471,7 @@ input, select {
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--surface);
+    color: var(--text);
     font-size: 11px;
 }
 
@@ -419,7 +488,7 @@ input, select {
 }
 
 .table-container::-webkit-scrollbar-thumb {
-    background: #cbd5d2;
+    background: var(--border);
     border-radius: 4px;
 }
 
@@ -432,7 +501,7 @@ input, select {
 .bill-table th {
     height: 38px;
     padding: 0 12px;
-    background: #fbfcfc;
+    background: var(--surface-soft);
     border-bottom: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 9px;
@@ -443,7 +512,7 @@ input, select {
 
 .bill-table td {
     padding: 10px 12px;
-    border-bottom: 1px solid #eef1f0;
+    border-bottom: 1px solid var(--border);
     color: var(--text);
     font-size: 12px;
     vertical-align: middle;
@@ -463,6 +532,7 @@ input, select {
     justify-content: center;
     border-radius: 50%;
     background: var(--primary-light);
+    color: var(--primary);
     font-size: 20px;
 }
 
@@ -494,6 +564,7 @@ input, select {
 .summary-row strong {
     font-size: 13px;
     font-weight: 750;
+    color: var(--text);
 }
 
 .summary-row.savings strong {
@@ -517,14 +588,14 @@ input, select {
     color: var(--primary);
 }
 
-/* FULL LENGTH BANNER STYLES */
+/* FULL LENGTH SAVINGS BANNER */
 .bill-savings-banner {
     width: 100%;
     margin-top: 14px;
     padding: 12px 14px;
-    background: #eefaf6;
-    border-top: 2px dashed #176b5b;
-    border-bottom: 2px dashed #176b5b;
+    background: var(--primary-light);
+    border-top: 2px dashed var(--primary);
+    border-bottom: 2px dashed var(--primary);
     text-align: center;
     box-sizing: border-box;
 }
@@ -532,14 +603,14 @@ input, select {
 .bill-savings-banner .savings-text {
     font-size: 14px;
     font-weight: 800;
-    color: #176b5b;
+    color: var(--primary);
     margin: 0 0 3px 0;
 }
 
 .bill-savings-banner .thank-you-text {
     font-size: 11px;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -566,19 +637,20 @@ input, select {
 }
 
 .btn.secondary {
-    background: #fff;
+    background: var(--surface);
     color: var(--text-secondary);
 }
 
 .btn.secondary:hover {
     background: var(--surface-soft);
+    color: var(--text);
 }
 
 .btn.primary {
     background: var(--primary);
     border-color: var(--primary);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(23, 107, 91, 0.16);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 .btn.primary:hover {
@@ -620,6 +692,7 @@ input, select {
     margin-top: 14px;
     font-size: 26px;
     font-weight: 800;
+    color: var(--text);
 }
 
 .sales-details {
@@ -643,18 +716,25 @@ input, select {
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--surface-soft);
+    color: var(--text);
     font-size: 10px;
     font-weight: 700;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: 0.2s ease;
+}
+
+.quick-actions button:hover {
+    border-color: var(--primary);
+    background: var(--surface);
 }
 
 .stock-row {
     padding: 8px 0;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #edf0ef;
+    border-bottom: 1px solid var(--border);
 }
 
 /* Modal */
@@ -666,7 +746,7 @@ input, select {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(18, 30, 27, 0.45);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
 }
 
@@ -677,8 +757,9 @@ input, select {
 .modal {
     width: min(500px, 100%);
     background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: 0 25px 70px rgba(15, 30, 26, 0.22);
+    box-shadow: var(--shadow-md);
 }
 
 .modal-header {
@@ -692,6 +773,7 @@ input, select {
     border: 0;
     background: transparent;
     font-size: 22px;
+    color: var(--text-muted);
 }
 
 #productForm {
@@ -737,7 +819,8 @@ input, select {
 
     button, .quantity-btn, .remove-item, 
     .product-search-section, .table-search-wrapper, 
-    .app-header, .bill-actions, .billing-sidebar {
+    .app-header, .bill-actions, .billing-sidebar,
+    .theme-toggle-btn {
         display: none !important;
     }
 
@@ -753,6 +836,7 @@ input, select {
         border: none !important;
         padding: 0 !important;
         margin: 0 !important;
+        background: #fff !important;
     }
 
     table {
