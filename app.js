@@ -4,6 +4,9 @@
    Application JavaScript
 ========================================================= */
 
+/* =========================================================
+   1. SAMPLE PRODUCT DATABASE
+========================================================= */
 let products = [
     { id: 1, name: "Aashirvaad Atta 5kg", mrp: 320, salePrice: 300, unit: "piece", category: "Atta" },
     { id: 2, name: "India Gate Basmati Rice 5kg", mrp: 650, salePrice: 610, unit: "piece", category: "Rice" },
@@ -15,10 +18,14 @@ let products = [
     { id: 8, name: "Parle-G Biscuits", mrp: 20, salePrice: 18, unit: "piece", category: "Biscuits" }
 ];
 
+/* =========================================================
+   2. CURRENT BILL & SEARCH TRACKING
+========================================================= */
 let currentBill = [];
+let selectedSearchIndex = -1; // Tracks arrow key navigation in search
 
 /* =========================================================
-   DOM ELEMENTS
+   3. DOM ELEMENTS
 ========================================================= */
 const productSearch = document.getElementById("productSearch");
 const searchResults = document.getElementById("searchResults");
@@ -40,7 +47,7 @@ const lowStock = document.getElementById("lowStock");
 const outOfStock = document.getElementById("outOfStock");
 
 /* =========================================================
-   APPLICATION START
+   4. APPLICATION START
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
@@ -54,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================================================
-   KEYBOARD SHORTCUTS
+   5. GLOBAL KEYBOARD SHORTCUTS (CTRL+S, Q, P, N)
 ========================================================= */
 function setupKeyboardShortcuts() {
     document.addEventListener("keydown", (e) => {
@@ -79,11 +86,42 @@ function setupKeyboardShortcuts() {
 }
 
 /* =========================================================
-   EVENT LISTENERS
+   6. EVENT LISTENERS
 ========================================================= */
 function setupEventListeners() {
-    if (productSearch) productSearch.addEventListener("input", handleProductSearch);
+    if (productSearch) {
+        productSearch.addEventListener("input", handleProductSearch);
+        
+        // Keydown listener for Arrow keys, Enter, and Escape
+        productSearch.addEventListener("keydown", (e) => {
+            if (!searchResults || searchResults.style.display === "none") return;
 
+            const results = searchResults.querySelectorAll(".search-result-item");
+            if (results.length === 0) return;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                selectedSearchIndex = (selectedSearchIndex + 1) % results.length;
+                updateSearchHighlight(results);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                selectedSearchIndex = (selectedSearchIndex - 1 + results.length) % results.length;
+                updateSearchHighlight(results);
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if (selectedSearchIndex > -1 && results[selectedSearchIndex]) {
+                    results[selectedSearchIndex].click();
+                } else if (results.length > 0) {
+                    // Default to first result if Enter is pressed without moving arrows
+                    results[0].click();
+                }
+            } else if (e.key === "Escape") {
+                hideSearchResults();
+            }
+        });
+    }
+
+    /* Clear search when clicking outside */
     document.addEventListener("click", (event) => {
         if (!event.target.closest(".product-search-section")) {
             hideSearchResults();
@@ -105,7 +143,7 @@ function setupEventListeners() {
     bindClick("productsBtn", openProductModal);
     bindClick("closeProductModal", closeProductModal);
     bindClick("cancelProductBtn", closeProductModal);
-    
+
     const productForm = document.getElementById("productForm");
     if (productForm) productForm.addEventListener("submit", addNewProduct);
 
@@ -115,6 +153,9 @@ function setupEventListeners() {
     bindClick("settingsBtn", () => alert("Settings will be added later."));
 }
 
+/* =========================================================
+   7. BILL ITEM BUTTON HANDLER
+========================================================= */
 function handleBillItemClick(event) {
     const button = event.target.closest("button");
     if (!button) return;
@@ -143,6 +184,9 @@ function handleBillItemClick(event) {
     }
 }
 
+/* =========================================================
+   8. INVOICE NUMBER & DATE
+========================================================= */
 function setInvoiceNumber() {
     if (!invoiceNumber) return;
     let savedNumber = Number(localStorage.getItem("groceryInvoiceNumber")) || 1;
@@ -156,10 +200,11 @@ function setInvoiceDate() {
 }
 
 /* =========================================================
-   PRODUCT SEARCH
+   9. PRODUCT SEARCH & DISPLAY
 ========================================================= */
 function handleProductSearch() {
     const searchTerm = productSearch.value.trim().toLowerCase();
+    selectedSearchIndex = -1; // Reset selection index on typing
 
     if (!searchTerm) {
         hideSearchResults();
@@ -190,6 +235,8 @@ function displaySearchResults(matches) {
     matches.forEach(product => {
         const result = document.createElement("button");
         result.type = "button";
+        result.className = "search-result-item"; // Added for keydown selection target
+
         result.style.cssText = `
             width:100%; padding:12px 14px; border:0; border-bottom:1px solid #eef1f0;
             background:#fff; display:flex; align-items:center; justify-content:space-between;
@@ -216,7 +263,12 @@ function displaySearchResults(matches) {
         `;
 
         result.addEventListener("mouseenter", () => { result.style.background = "#f4faf8"; });
-        result.addEventListener("mouseleave", () => { result.style.background = "#fff"; });
+        result.addEventListener("mouseleave", () => { 
+            const items = searchResults.querySelectorAll(".search-result-item");
+            if (items[selectedSearchIndex] !== result) {
+                result.style.background = "#fff";
+            }
+        });
         result.addEventListener("click", () => { addProductToBill(product); });
 
         searchResults.appendChild(result);
@@ -225,6 +277,20 @@ function displaySearchResults(matches) {
     searchResults.style.display = "block";
 }
 
+function updateSearchHighlight(results) {
+    results.forEach((item, index) => {
+        if (index === selectedSearchIndex) {
+            item.style.background = "#f4faf8";
+            item.scrollIntoView({ block: "nearest" });
+        } else {
+            item.style.background = "#fff";
+        }
+    });
+}
+
+/* =========================================================
+   10. ADD PRODUCT TO BILL
+========================================================= */
 function addProductToBill(product) {
     const existing = currentBill.find(item => item.id === product.id);
 
@@ -248,7 +314,7 @@ function addProductToBill(product) {
 }
 
 /* =========================================================
-   RENDER BILL
+   11. RENDER BILL & TOTALS
 ========================================================= */
 function renderBill() {
     if (!billItems) return;
@@ -326,6 +392,9 @@ function updateTotals() {
     if (itemCount) itemCount.textContent = totalItems + (totalItems === 1 ? " Item" : " Items");
 }
 
+/* =========================================================
+   12. BILL ACTIONS (CLEAR, NEW, SAVE, PRINT)
+========================================================= */
 function clearBill() {
     if (currentBill.length === 0) return;
     if (!confirm("Are you sure you want to clear this bill?")) return;
@@ -404,7 +473,7 @@ function printBill() {
 }
 
 /* =========================================================
-   PRODUCT MODAL & ADD PRODUCT
+   13. PRODUCT MODAL & INVENTORY STATS
 ========================================================= */
 function openProductModal() {
     const modal = document.getElementById("productModal");
@@ -492,7 +561,7 @@ function updateSalesDashboard() {
 }
 
 /* =========================================================
-   EXCEL & CSV IMPORTER
+   14. IMPORT EXCEL & CSV
 ========================================================= */
 function importExcel() {
     const fileInput = document.createElement("input");
@@ -601,8 +670,12 @@ function handleExcelFile(event) {
     }
 }
 
+/* =========================================================
+   15. HELPERS
+========================================================= */
 function hideSearchResults() {
     if (searchResults) searchResults.style.display = "none";
+    selectedSearchIndex = -1;
 }
 
 function formatMoney(amount) {
