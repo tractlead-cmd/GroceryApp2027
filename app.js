@@ -207,6 +207,10 @@ function setupEventListeners() {
         .getElementById("clearBillBtn")
         .addEventListener("click", clearBill);
 
+   /* Bill quantity and remove buttons */
+
+    billItems.addEventListener("click", handleBillItemClick);
+
 
     /* Print Bill */
 
@@ -352,7 +356,82 @@ function setupEventListeners() {
 
 }
 
+/* =========================================================
+   BILL ITEM BUTTON HANDLER
+========================================================= */
 
+function handleBillItemClick(event) {
+
+    const button =
+        event.target.closest("button");
+
+    if (!button) return;
+
+
+    /* Increase / decrease quantity */
+
+    if (
+        button.classList.contains("quantity-btn")
+    ) {
+
+        const id =
+            Number(button.dataset.id);
+
+        const action =
+            button.dataset.action;
+
+        const item =
+            currentBill.find(
+                product => product.id === id
+            );
+
+        if (!item) return;
+
+
+        if (action === "increase") {
+
+            item.quantity += 1;
+
+        }
+
+
+        if (action === "decrease") {
+
+            item.quantity -= 1;
+
+
+            if (item.quantity <= 0) {
+
+                removeProduct(id);
+
+                return;
+
+            }
+
+        }
+
+
+        renderBill();
+
+        return;
+
+    }
+
+
+    /* Remove product */
+
+    if (
+        button.classList.contains("remove-item")
+    ) {
+
+        const id =
+            Number(button.dataset.id);
+
+        removeProduct(id);
+
+    }
+
+}
 /* =========================================================
    6. INVOICE NUMBER
 ========================================================= */
