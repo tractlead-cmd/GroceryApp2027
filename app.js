@@ -925,56 +925,43 @@ function removeProduct(id) {
    14. CALCULATE TOTALS
 ========================================================= */
 
+/* =========================================================
+   CALCULATE TOTALS & UPDATE BANNER
+========================================================= */
+
 function updateTotals() {
 
     let mrpTotal = 0;
-
     let saleTotal = 0;
-
     let totalItems = 0;
 
-
     currentBill.forEach(item => {
-
-        mrpTotal +=
-            item.mrp *
-            item.quantity;
-
-
-        saleTotal +=
-            item.salePrice *
-            item.quantity;
-
-
-        totalItems +=
-            item.quantity;
-
+        mrpTotal += item.mrp * item.quantity;
+        saleTotal += item.salePrice * item.quantity;
+        totalItems += item.quantity;
     });
 
+    const savings = mrpTotal - saleTotal;
 
-    const savings =
-        mrpTotal -
-        saleTotal;
+    totalMrp.textContent = "₹" + formatMoney(mrpTotal);
+    totalSavings.textContent = "₹" + formatMoney(savings);
+    grandTotal.textContent = "₹" + formatMoney(saleTotal);
+    itemCount.textContent = totalItems + (totalItems === 1 ? " Item" : " Items");
 
+    /* Banner logic */
+    const thankYouBanner = document.getElementById("billThankYouBanner");
+    const savingsAmountSpan = document.getElementById("bannerSavingsAmount");
 
-    totalMrp.textContent =
-        "₹" + formatMoney(mrpTotal);
-
-
-    totalSavings.textContent =
-        "₹" + formatMoney(savings);
-
-
-    grandTotal.textContent =
-        "₹" + formatMoney(saleTotal);
-
-
-    itemCount.textContent =
-        totalItems +
-        (totalItems === 1 ? " Item" : " Items");
+    if (thankYouBanner && savingsAmountSpan) {
+        if (currentBill.length > 0) {
+            savingsAmountSpan.textContent = "₹" + formatMoney(savings);
+            thankYouBanner.style.display = "block";
+        } else {
+            thankYouBanner.style.display = "none";
+        }
+    }
 
 }
-
 
 /* =========================================================
    15. CLEAR BILL
