@@ -919,37 +919,6 @@ function renderBill() {
 
     /* Quantity buttons */
 
-    document
-        .querySelectorAll(".quantity-btn")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                handleQuantityChange
-            );
-
-        });
-
-
-    /* Remove buttons */
-
-    document
-        .querySelectorAll(".remove-item")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    removeProduct(
-                        Number(button.dataset.id)
-                    );
-
-                }
-            );
-
-        });
-
 
     updateTotals();
 
