@@ -12,28 +12,76 @@
 <body>
 
     <!-- ==========================================
-         APP HEADER
+         APP HEADER (WITH INTEGRATED INVOICE & CUSTOMER INFO)
     =========================================== -->
     <header class="app-header">
-        <div class="brand">
-            <div class="brand-icon">SR</div>
-            <div class="brand-text">
-                <h1>Sri Raghavendra Grocery</h1>
-                <span>Billing & Inventory</span>
+        
+        <!-- Top Row: Brand, Invoice Details & Action Buttons -->
+        <div class="header-top-row">
+            <div class="brand">
+                <div class="brand-icon">SR</div>
+                <div class="brand-text">
+                    <h1>Sri Raghavendra Grocery</h1>
+                    <span>Billing & Inventory</span>
+                </div>
+            </div>
+
+            <!-- Integrated Invoice Information -->
+            <div class="header-invoice-info">
+                <div class="invoice-meta">
+                    <span class="meta-label">NEW BILL</span>
+                    <strong class="meta-title">Create Invoice</strong>
+                </div>
+
+                <div class="invoice-number">
+                    <span>Invoice</span>
+                    <strong id="invoiceNumber">#000001</strong>
+                </div>
+
+                <div class="invoice-date">
+                    <span>Date</span>
+                    <strong id="invoiceDate">--</strong>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="header-btn" id="productsBtn">Products</button>
+                <button class="header-btn" id="salesBtn">Sales</button>
+                <button class="header-btn primary" id="newBillBtn">+ New Bill</button>
             </div>
         </div>
 
-        <div class="header-actions">
-            <button class="header-btn" id="productsBtn">
-                Products
-            </button>
-            <button class="header-btn" id="salesBtn">
-                Sales
-            </button>
-            <button class="header-btn primary" id="newBillBtn">
-                + New Bill
-            </button>
+        <!-- Bottom Row: Inline Customer Information -->
+        <div class="header-customer-bar">
+            <div class="header-form-group">
+                <label for="customerPhone">Customer Phone</label>
+                <input
+                    type="tel"
+                    id="customerPhone"
+                    placeholder="Enter phone number"
+                    maxlength="10"
+                >
+            </div>
+
+            <div class="header-form-group">
+                <label for="customerName">Customer Name</label>
+                <input
+                    type="text"
+                    id="customerName"
+                    placeholder="Optional"
+                >
+            </div>
+
+            <div class="header-form-group">
+                <label for="paymentMethod">Payment Method</label>
+                <select id="paymentMethod">
+                    <option value="cash">Cash</option>
+                    <option value="upi">UPI</option>
+                    <option value="card">Card</option>
+                </select>
+            </div>
         </div>
+
     </header>
 
 
@@ -47,63 +95,8 @@
         ======================================= -->
         <section class="billing-section">
 
-            <!-- BILL TOP BAR -->
-            <div class="billing-top">
-                <div>
-                    <span class="section-label">NEW BILL</span>
-                    <h2>Create Invoice</h2>
-                </div>
-
-                <div class="invoice-info">
-                    <div class="invoice-number">
-                        <span>Invoice</span>
-                        <strong id="invoiceNumber">#000001</strong>
-                    </div>
-
-                    <div class="invoice-date">
-                        <span>Date</span>
-                        <strong id="invoiceDate">--</strong>
-                    </div>
-                </div>
-            </div>
-
-
             <!-- ==================================
-                 CUSTOMER INFORMATION
-            =================================== -->
-            <div class="customer-card">
-                <div class="form-group">
-                    <label for="customerPhone">Customer Phone</label>
-                    <input
-                        type="tel"
-                        id="customerPhone"
-                        placeholder="Enter phone number"
-                        maxlength="10"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="customerName">Customer Name</label>
-                    <input
-                        type="text"
-                        id="customerName"
-                        placeholder="Optional"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="paymentMethod">Payment Method</label>
-                    <select id="paymentMethod">
-                        <option value="cash">Cash</option>
-                        <option value="upi">UPI</option>
-                        <option value="card">Card</option>
-                    </select>
-                </div>
-            </div>
-
-
-            <!-- ==================================
-                 PRODUCT SEARCH
+                 PRODUCT SEARCH (NOW RIGHT AT THE TOP)
             =================================== -->
             <div class="product-search-section">
                 <label for="productSearch">Add Products</label>
