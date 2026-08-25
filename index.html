@@ -306,18 +306,21 @@
                 <div class="summary-divider"></div>
 
 
-                <div class="summary-row grand-total">
+<!-- GRAND TOTAL ROW -->
+<div class="summary-row total-row">
+    <span>Grand Total</span>
+    <span id="grandTotal">₹0.00</span>
+</div>
 
-                    <span>Grand Total</span>
-
-                    <strong id="grandTotal">
-                        ₹0.00
-                    </strong>
-
-                </div>
-
-            </div>
-
+<!-- ADDED: Thank You & Savings Banner -->
+<div id="billThankYouBanner" class="bill-savings-banner" style="display: none;">
+    <p class="savings-text">
+        🎉 You saved <span id="bannerSavingsAmount">₹0.00</span> with this bill!
+    </p>
+    <p class="thank-you-text">
+        Thank you for shopping with us — Kindly visit again. Thank You :-)
+    </p>
+</div>
 
             <!-- ==================================
                  BILL ACTIONS
