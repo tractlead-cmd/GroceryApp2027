@@ -225,7 +225,7 @@ function handleSearchKeyboardNavigation(event) {
 function updateSearchHighlight(items) {
     items.forEach((item, index) => {
         if (index === selectedSearchIndex) {
-            item.style.background = "#176b5b"; // Active highlight color
+            item.style.background = "#484a4a"; // Active highlight color
             item.scrollIntoView({ block: "nearest" });
         } else {
             item.style.background = "#fff";
