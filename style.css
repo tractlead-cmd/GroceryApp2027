@@ -392,13 +392,21 @@ body {
     margin-left: 6px;
 }
 
-/* Uniform Hover & Arrow Key Selection (.selected) */
+/* ==========================================
+   HOVER & ARROW KEY NAVIGATION HIGHLIGHT
+=========================================== */
 .search-result-item:hover,
 .search-result-item.selected {
-    background-color: var(--card-bg-hover) !important;
-    border-left: 4px solid var(--primary-color) !important;
+    background-color: #6d28d9 !important; /* Rich Purple Background */
+    color: #ffffff !important;            /* Pure White Text */
+    border-left: none !important;          /* Removes the green border */
 }
 
+/* Ensures text inside the item also turns white on hover/arrow selection */
+.search-result-item:hover *,
+.search-result-item.selected * {
+    color: #ffffff !important;
+}
 /* ==========================================
    BILL ITEMS TABLE
 =========================================== */
