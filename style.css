@@ -6,7 +6,7 @@
     --bg-main: #0f172a;
     --bg-header: #1e293b;
     --card-bg: #1e293b;
-    --card-bg-hover: #334155;
+    --card-bg-hover: #2d3d52;
     --border-color: #334155;
     
     --text-main: #f8fafc;
@@ -30,8 +30,8 @@
     --bg-main: #f1f5f9;
     --bg-header: #ffffff;
     --card-bg: #ffffff;
-    --card-bg-hover: #f8fafc;
-    --border-color: #e2e8f0;
+    --card-bg-hover: #e2e8f0;
+    --border-color: #cbd5e1;
 
     --text-main: #0f172a;
     --text-muted: #64748b;
@@ -60,7 +60,7 @@ body {
     background-color: var(--bg-main);
     color: var(--text-main);
     min-height: 100vh;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sr-only {
@@ -137,7 +137,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease;
     margin-left: 8px;
 }
 
@@ -177,7 +177,7 @@ body {
     color: var(--text-muted);
 }
 
-/* Action Buttons */
+/* Header Buttons */
 .header-actions {
     display: flex;
     gap: 10px;
@@ -208,7 +208,7 @@ body {
     background: var(--primary-hover);
 }
 
-/* Bottom Customer Bar */
+/* Customer Information Bar */
 .header-customer-bar {
     display: flex;
     gap: 16px;
@@ -250,7 +250,7 @@ body {
 }
 
 /* ==========================================
-   MAIN LAYOUT & CONTAINER
+   MAIN CONTAINER LAYOUT
 =========================================== */
 .app-container {
     max-width: 1400px;
@@ -268,7 +268,7 @@ body {
 }
 
 /* ==========================================
-   PRODUCT SEARCH & DROPDOWN FIX
+   SEARCH BAR & SEARCH DROPDOWN STYLES
 =========================================== */
 .product-search-section {
     position: relative;
@@ -326,7 +326,7 @@ body {
     cursor: pointer;
 }
 
-/* Dark Mode Fixed Search Results Dropdown */
+/* Search Results Dropdown Overlay */
 .search-results {
     position: absolute;
     top: 100%;
@@ -340,37 +340,63 @@ body {
     max-height: 280px;
     overflow-y: auto;
     margin-top: 6px;
+    display: none;
 }
 
+.search-results.active {
+    display: block;
+}
+
+/* Search Result List Item */
 .search-result-item {
     padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-bg) !important;
     color: var(--text-main) !important;
-    background-color: transparent;
     cursor: pointer;
     transition: background-color 0.15s ease;
 }
 
-.search-result-item:hover {
-    background-color: var(--card-bg-hover) !important;
+.search-result-item .item-details {
+    display: flex;
+    flex-direction: column;
 }
 
-.search-result-item .item-title {
-    color: var(--text-main);
+.search-result-item .item-name {
     font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-main) !important;
 }
 
-.search-result-item .item-subtext {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+.search-result-item .item-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted) !important;
+}
+
+.search-result-item .item-price-block {
+    text-align: right;
 }
 
 .search-result-item .item-price {
-    color: var(--primary-color);
     font-weight: 700;
+    color: var(--primary-color) !important;
+}
+
+.search-result-item .item-mrp {
+    font-size: 0.75rem;
+    text-decoration: line-through;
+    color: var(--text-muted) !important;
+    margin-left: 6px;
+}
+
+/* Uniform Hover & Arrow Key Selection (.selected) */
+.search-result-item:hover,
+.search-result-item.selected {
+    background-color: var(--card-bg-hover) !important;
+    border-left: 4px solid var(--primary-color) !important;
 }
 
 /* ==========================================
@@ -444,6 +470,25 @@ body {
     font-size: 0.9rem;
 }
 
+.bill-table input.qty-input {
+    width: 60px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.btn-remove {
+    background: transparent;
+    border: none;
+    color: var(--danger-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
 .empty-state {
     text-align: center;
     padding: 40px 0;
@@ -456,7 +501,7 @@ body {
 }
 
 /* ==========================================
-   SUMMARY BANNER & ACTIONS
+   BILL SUMMARY & ACTIONS
 =========================================== */
 .bill-summary {
     background: var(--card-bg);
