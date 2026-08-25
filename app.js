@@ -323,10 +323,14 @@ function newBill() {
     if (currentBill.length > 0 && !confirm("Start a new bill? The current unsaved bill will be cleared.")) return;
 
     resetBillState();
+    
+    // Optional: Auto-increment invoice number on New Bill demand
+    const currentNum = Number(localStorage.getItem("groceryInvoiceNumber")) || 1;
+    localStorage.setItem("groceryInvoiceNumber", currentNum + 1);
+
     setInvoiceNumber();
     setInvoiceDate();
 }
-
 function resetBillState() {
     currentBill = [];
     if (customerPhone) customerPhone.value = "";
