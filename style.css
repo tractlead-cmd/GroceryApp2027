@@ -1634,27 +1634,57 @@ select {
 }
 
 /* =========================================================
-   PRINT / PDF FIX FOR BILLED ITEMS
+   PRINT & PDF LAYOUT OVERRIDES
 ========================================================= */
 @media print {
-    /* Expand table container to fit all items fully */
-    .table-container {
-        max-height: none !important;
+    /* 1. Reset full page layout and scrolling */
+    html, body {
+        height: auto !important;
         overflow: visible !important;
+        background: #fff !important;
+        color: #000 !important;
     }
 
-    /* Hide the search bar on printed/downloaded invoices */
-    .table-search-wrapper {
+    /* 2. Hide interactive app UI elements during print */
+    button, 
+    .quantity-btn, 
+    .remove-item, 
+    .product-search-section, 
+    .table-search-wrapper,
+    .app-header, 
+    .action-buttons,
+    #scanBtn,
+    #clearBillBtn {
         display: none !important;
     }
 
-    /* Ensure entire table page breaks cleanly if very long */
+    /* 3. Force table container to expand fully without scrolling */
+    .table-container {
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        border: none !important;
+    }
+
+    /* 4. Formatting for table rendering */
+    .bill-items-card {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
     table {
+        width: 100% !important;
         page-break-inside: auto;
     }
 
     tr {
         page-break-inside: avoid;
         page-break-after: auto;
+    }
+
+    /* 5. Clean up display for QTY numbers when buttons are hidden */
+    td strong {
+        display: inline-block !important;
     }
 }
