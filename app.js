@@ -1,7 +1,7 @@
 /* =========================================================
    SRI RAGHAVENDRA GROCERY
    BILLING & INVENTORY SYSTEM
-   Application JavaScript (Complete Engine)
+   Application JavaScript (Complete Engine with Keyboard Support)
 ========================================================= */
 
 /* Default Product Database */
@@ -17,6 +17,7 @@ let products = [
 ];
 
 let currentBill = [];
+let selectedSearchIndex = -1; // Track highlighted item in dropdown
 
 /* DOM Element References */
 let productSearch, searchResults, billedItemsSearch, billItems;
@@ -34,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSalesDashboard();
     renderBill();
     setupEventListeners();
+    setupGlobalKeyboardShortcuts();
 });
 
 /* Bind DOM Elements safely */
@@ -62,9 +64,36 @@ function initElements() {
     outOfStock = document.getElementById("outOfStock");
 }
 
+/* Global Keyboard Shortcuts (Ctrl+S, Ctrl+Q, Ctrl+P) */
+function setupGlobalKeyboardShortcuts() {
+    document.addEventListener("keydown", (event) => {
+        // Check for Ctrl key (or Cmd key on Mac)
+        const isControl = event.ctrlKey || event.metaKey;
+
+        if (isControl) {
+            const key = event.key.toLowerCase();
+
+            if (key === 's') {
+                event.preventDefault(); // Prevent browser default "Save Page"
+                saveBill();
+            } else if (key === 'q') {
+                event.preventDefault();
+                clearBill();
+            } else if (key === 'p') {
+                event.preventDefault(); // Prevent default print dialog to ensure bill print fires safely
+                printBill();
+            }
+        }
+    });
+}
+
 /* Event Listeners Setup */
 function setupEventListeners() {
-    if (productSearch) productSearch.addEventListener("input", handleProductSearch);
+    if (productSearch) {
+        productSearch.addEventListener("input", handleProductSearch);
+        productSearch.addEventListener("keydown", handleSearchKeyboardNavigation);
+    }
+    
     if (billedItemsSearch) billedItemsSearch.addEventListener("input", renderBill);
 
     // Close search dropdown when clicking outside
@@ -95,7 +124,7 @@ function setupEventListeners() {
 
     bindClick("importExcelBtn", importExcel);
 
-    // Placeholders for secondary navigation
+    // Navigation placeholders
     const notImplemented = () => alert("This module will be available in the next release.");
     bindClick("viewSalesBtn", notImplemented);
     bindClick("salesBtn", notImplemented);
@@ -120,7 +149,7 @@ function setInvoiceDate() {
     invoiceDate.textContent = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-/* Product Search Dropdown */
+/* Product Search Dropdown & Key Navigation */
 function handleProductSearch() {
     const searchTerm = productSearch.value.trim().toLowerCase();
     if (!searchTerm) {
@@ -137,6 +166,7 @@ function handleProductSearch() {
 function displaySearchResults(matches) {
     if (!searchResults) return;
     searchResults.innerHTML = "";
+    selectedSearchIndex = -1; // Reset selection index on search update
 
     if (matches.length === 0) {
         searchResults.innerHTML = `<div style="padding:14px;text-align:center;color:#929b99;font-size:12px;">No products found</div>`;
@@ -144,9 +174,11 @@ function displaySearchResults(matches) {
         return;
     }
 
-    matches.forEach(product => {
+    matches.forEach((product, index) => {
         const result = document.createElement("button");
         result.type = "button";
+        result.className = "search-result-item";
+        result.dataset.index = index;
         result.style.cssText = "width:100%;padding:10px 14px;border:0;border-bottom:1px solid #eef1f0;background:#fff;display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;";
         result.innerHTML = `
             <div>
@@ -165,8 +197,45 @@ function displaySearchResults(matches) {
     searchResults.style.display = "block";
 }
 
+/* Handles Keyboard Up/Down/Enter in Search Box */
+function handleSearchKeyboardNavigation(event) {
+    const items = searchResults.querySelectorAll(".search-result-item");
+    if (!items.length || searchResults.style.display === "none") return;
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+        selectedSearchIndex = (selectedSearchIndex + 1) % items.length;
+        updateSearchHighlight(items);
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        selectedSearchIndex = (selectedSearchIndex - 1 + items.length) % items.length;
+        updateSearchHighlight(items);
+    } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (selectedSearchIndex >= 0 && selectedSearchIndex < items.length) {
+            items[selectedSearchIndex].click();
+        } else if (items.length > 0) {
+            items[0].click(); // Default to first item if enter pressed directly
+        }
+    } else if (event.key === "Escape") {
+        hideSearchResults();
+    }
+}
+
+function updateSearchHighlight(items) {
+    items.forEach((item, index) => {
+        if (index === selectedSearchIndex) {
+            item.style.background = "#eef7f5"; // Active highlight color
+            item.scrollIntoView({ block: "nearest" });
+        } else {
+            item.style.background = "#fff";
+        }
+    });
+}
+
 function hideSearchResults() {
     if (searchResults) searchResults.style.display = "none";
+    selectedSearchIndex = -1;
 }
 
 /* Add Item to Active Bill */
@@ -297,7 +366,6 @@ function updateTotals() {
     if (grandTotal) grandTotal.textContent = "₹" + formatMoney(saleTotal);
     if (itemCount) itemCount.textContent = totalQty + (totalQty === 1 ? " Item" : " Items");
 
-    // Dynamic Full Banner Update
     const thankYouBanner = document.getElementById("billThankYouBanner");
     const bannerSavingsAmount = document.getElementById("bannerSavingsAmount");
 
@@ -323,14 +391,10 @@ function newBill() {
     if (currentBill.length > 0 && !confirm("Start a new bill? The current unsaved bill will be cleared.")) return;
 
     resetBillState();
-    
-    // Optional: Auto-increment invoice number on New Bill demand
-    const currentNum = Number(localStorage.getItem("groceryInvoiceNumber")) || 1;
-    localStorage.setItem("groceryInvoiceNumber", currentNum + 1);
-
     setInvoiceNumber();
     setInvoiceDate();
 }
+
 function resetBillState() {
     currentBill = [];
     if (customerPhone) customerPhone.value = "";
