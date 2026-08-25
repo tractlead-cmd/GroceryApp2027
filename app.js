@@ -357,7 +357,7 @@ function setupEventListeners() {
 }
 
 /* =========================================================
-   BILL ITEM BUTTON HANDLER
+   BILL ITEM BUTTON HANDLER (FIXED)
 ========================================================= */
 
 function handleBillItemClick(event) {
@@ -374,15 +374,15 @@ function handleBillItemClick(event) {
         button.classList.contains("quantity-btn")
     ) {
 
-        const id =
-            Number(button.dataset.id);
+        const id = button.dataset.id; // Retain original type string/number
 
         const action =
             button.dataset.action;
 
+        // FIXED: Loose comparison (==) allows string and numeric IDs to match
         const item =
             currentBill.find(
-                product => product.id === id
+                product => product.id == id
             );
 
         if (!item) return;
@@ -424,8 +424,7 @@ function handleBillItemClick(event) {
         button.classList.contains("remove-item")
     ) {
 
-        const id =
-            Number(button.dataset.id);
+        const id = button.dataset.id;
 
         removeProduct(id);
 
@@ -663,14 +662,15 @@ function displaySearchResults(matches) {
 
 
 /* =========================================================
-   10. ADD PRODUCT TO BILL
+   10. ADD PRODUCT TO BILL (FIXED)
 ========================================================= */
 
 function addProductToBill(product) {
 
+    // FIXED: Loose comparison (==) handles string vs integer IDs
     const existing =
         currentBill.find(
-            item => item.id === product.id
+            item => item.id == product.id
         );
 
 
@@ -926,24 +926,22 @@ function renderBill() {
 
 
 /* =========================================================
-   12. QUANTITY CHANGE
+   12. QUANTITY CHANGE (FIXED)
 ========================================================= */
 
 function handleQuantityChange(event) {
 
-    const id =
-        Number(
-            event.currentTarget.dataset.id
-        );
+    const id = event.currentTarget.dataset.id;
 
 
     const action =
         event.currentTarget.dataset.action;
 
 
+    // FIXED: Loose comparison (==) allows matching across types
     const item =
         currentBill.find(
-            product => product.id === id
+            product => product.id == id
         );
 
 
@@ -979,14 +977,15 @@ function handleQuantityChange(event) {
 
 
 /* =========================================================
-   13. REMOVE PRODUCT
+   13. REMOVE PRODUCT (FIXED)
 ========================================================= */
 
 function removeProduct(id) {
 
+    // FIXED: Loose inequality (!=) preserves non-matching IDs regardless of type
     currentBill =
         currentBill.filter(
-            item => item.id !== id
+            item => item.id != id
         );
 
 
