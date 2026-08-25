@@ -1,7 +1,7 @@
 /* =========================================================
    SRI RAGHAVENDRA GROCERY
    BILLING & INVENTORY SYSTEM
-   Application JavaScript (Fixed & Bulletproof)
+   Application JavaScript (Complete & Fully Integrated)
 ========================================================= */
 
 /* =========================================================
@@ -44,7 +44,7 @@ const lowStock = document.getElementById("lowStock");
 const outOfStock = document.getElementById("outOfStock");
 
 /* =========================================================
-   3. INIT
+   3. APPLICATION INITIALIZATION
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
@@ -58,14 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================================================
-   4. SHORTCUTS (Ctrl+S, Q, P, N)
+   4. GLOBAL KEYBOARD SHORTCUTS (Ctrl+S, Q, P, N)
 ========================================================= */
 function setupKeyboardShortcuts() {
     document.addEventListener("keydown", (e) => {
-        // Don't trigger shortcuts if user is inside an input field unless it's Ctrl combination
-        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
         const isCtrl = e.ctrlKey || e.metaKey;
-        
         if (!isCtrl) return;
 
         const key = e.key.toLowerCase();
@@ -77,41 +74,43 @@ function setupKeyboardShortcuts() {
 }
 
 /* =========================================================
-   5. EVENT LISTENERS
+   5. EVENT LISTENERS & DELEGATION
 ========================================================= */
 function setupEventListeners() {
+    /* Product Search Input (Master Search + In-Bill Real-time Filter) */
     if (productSearch) {
-        productSearch.addEventListener("input", handleProductSearch);
+        productSearch.addEventListener("input", (e) => {
+            handleProductSearch();
+            filterTableRows(e.target.value.trim().toLowerCase());
+        });
         productSearch.addEventListener("keydown", handleSearchKeyDown);
     }
 
+    /* Close Dropdown on Outside Click */
     document.addEventListener("click", (event) => {
         if (productSearch && !event.target.closest(".product-search-section") && !event.target.closest("#searchResults")) {
             hideSearchResults();
         }
     });
 
-    // Direct event delegation on billItems for reliable button clicks
+    /* Direct delegation for + / - / x buttons in table */
     if (billItems) {
         billItems.addEventListener("click", (e) => {
             const btn = e.target.closest("button");
             if (!btn) return;
-            
-            e.stopPropagation(); // Stop click from bubbling up
-            
+
+            e.stopPropagation();
+
             const id = Number(btn.getAttribute("data-id"));
             const action = btn.getAttribute("data-action");
-            
-            if (action === "increase") {
-                changeQuantity(id, 1);
-            } else if (action === "decrease") {
-                changeQuantity(id, -1);
-            } else if (action === "remove") {
-                removeProduct(id);
-            }
+
+            if (action === "increase") changeQuantity(id, 1);
+            else if (action === "decrease") changeQuantity(id, -1);
+            else if (action === "remove") removeProduct(id);
         });
     }
 
+    /* Helper for Quick Element Click Bindings */
     const bindClick = (id, fn) => {
         const el = document.getElementById(id);
         if (el) el.addEventListener("click", fn);
@@ -137,7 +136,29 @@ function setupEventListeners() {
 }
 
 /* =========================================================
-   6. QUANTITY & REMOVE LOGIC
+   6. REAL-TIME TABLE FILTERING (FILTER ADDED ITEMS)
+========================================================= */
+function filterTableRows(query) {
+    if (!billItems) return;
+    const rows = billItems.querySelectorAll("tr");
+
+    rows.forEach(row => {
+        if (row.classList.contains("empty-bill")) return;
+
+        const productNameCell = row.querySelector("td:first-child");
+        if (productNameCell) {
+            const text = productNameCell.textContent.toLowerCase();
+            if (text.includes(query)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        }
+    });
+}
+
+/* =========================================================
+   7. QUANTITY MODIFIERS & REMOVE
 ========================================================= */
 function changeQuantity(id, delta) {
     const item = currentBill.find(p => Number(p.id) === Number(id));
@@ -157,7 +178,7 @@ function removeProduct(id) {
 }
 
 /* =========================================================
-   7. SEARCH & KEYBOARD NAV (ARROW KEYS + ENTER)
+   8. PRODUCT CATALOG SEARCH & ARROW KEY NAVIGATION
 ========================================================= */
 function handleProductSearch() {
     const searchTerm = productSearch.value.trim().toLowerCase();
@@ -267,7 +288,7 @@ function hideSearchResults() {
 }
 
 /* =========================================================
-   8. ADD PRODUCT TO BILL
+   9. ADD PRODUCT TO BILL
 ========================================================= */
 function addProductToBill(product) {
     const existing = currentBill.find(item => Number(item.id) === Number(product.id));
@@ -293,7 +314,7 @@ function addProductToBill(product) {
 }
 
 /* =========================================================
-   9. RENDER TABLE & TOTALS
+   10. RENDER BILL & TOTALS
 ========================================================= */
 function renderBill() {
     if (!billItems) return;
@@ -343,6 +364,11 @@ function renderBill() {
         billItems.appendChild(row);
     });
 
+    /* Apply active filter text if user has search query typed */
+    if (productSearch && productSearch.value.trim()) {
+        filterTableRows(productSearch.value.trim().toLowerCase());
+    }
+
     updateTotals();
 }
 
@@ -364,7 +390,7 @@ function updateTotals() {
 }
 
 /* =========================================================
-   10. BILL OPERATIONS
+   11. BILL MANAGEMENT (CLEAR, NEW, SAVE, PRINT)
 ========================================================= */
 function clearBill() {
     if (currentBill.length === 0) return;
@@ -444,7 +470,7 @@ function printBill() {
 }
 
 /* =========================================================
-   11. STATS & MODAL
+   12. DASHBOARD & INVENTORY HELPERS
 ========================================================= */
 function setInvoiceNumber() {
     if (!invoiceNumber) return;
@@ -541,7 +567,7 @@ function updateSalesDashboard() {
 }
 
 /* =========================================================
-   12. EXCEL & CSV IMPORTER
+   13. EXCEL & CSV IMPORTER
 ========================================================= */
 function importExcel() {
     const fileInput = document.createElement("input");
@@ -651,7 +677,7 @@ function handleExcelFile(event) {
 }
 
 /* =========================================================
-   13. UTILS
+   14. FORMATTING UTILITIES
 ========================================================= */
 function formatMoney(amount) {
     return Number(amount || 0).toLocaleString("en-IN", {
