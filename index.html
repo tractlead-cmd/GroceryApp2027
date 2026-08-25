@@ -12,7 +12,7 @@
 <body>
 
     <!-- ==========================================
-         APP HEADER (WITH INTEGRATED INVOICE & CUSTOMER INFO)
+         APP HEADER
     =========================================== -->
     <header class="app-header">
         
@@ -24,6 +24,10 @@
                     <h1>Sri Raghavendra Grocery</h1>
                     <span>Billing & Inventory</span>
                 </div>
+                <!-- THEME TOGGLE BUTTON -->
+                <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
             </div>
 
             <!-- Integrated Invoice Information -->
@@ -85,20 +89,15 @@
 
     </header>
 
-
     <!-- ==========================================
          MAIN APPLICATION
     =========================================== -->
     <main class="app-container">
 
-        <!-- ======================================
-             BILLING SECTION
-        ======================================= -->
+        <!-- BILLING SECTION -->
         <section class="billing-section">
 
-            <!-- ==================================
-                 PRODUCT SEARCH
-            =================================== -->
+            <!-- PRODUCT SEARCH -->
             <div class="product-search-section">
                 <label for="productSearch">Add Products</label>
 
@@ -119,15 +118,11 @@
                 <div class="search-results" id="searchResults" role="region" aria-live="polite"></div>
             </div>
 
-
-            <!-- ==================================
-                 BILL ITEMS TABLE
-            =================================== -->
+            <!-- BILL ITEMS TABLE -->
             <div class="bill-items-card">
                 <div class="table-header">
                     <h3>Bill Items</h3>
 
-                    <!-- Search input inside table header -->
                     <div class="table-search-wrapper">
                         <label for="billedItemsSearch" class="sr-only">Search items in bill</label>
                         <input 
@@ -170,10 +165,7 @@
                 </div>
             </div>
 
-
-            <!-- ==================================
-                 BILL SUMMARY & BANNER
-            =================================== -->
+            <!-- BILL SUMMARY & BANNER -->
             <div class="bill-summary">
                 <div class="summary-row">
                     <span>Total MRP</span>
@@ -187,13 +179,11 @@
 
                 <div class="summary-divider"></div>
 
-                <!-- GRAND TOTAL ROW -->
                 <div class="summary-row total-row">
                     <span>Grand Total</span>
                     <span id="grandTotal">₹0.00</span>
                 </div>
 
-                <!-- FULL LENGTH BANNER -->
                 <div id="billThankYouBanner" class="bill-savings-banner" style="display: none;">
                     <p class="savings-text">
                         🎉 You saved <span id="bannerSavingsAmount">₹0.00</span> with this bill!
@@ -204,33 +194,17 @@
                 </div>
             </div>
 
-
-            <!-- ==================================
-                 BILL ACTIONS
-            =================================== -->
+            <!-- BILL ACTIONS -->
             <div class="bill-actions">
-                <button type="button" class="btn secondary" id="clearBillBtn">
-                    Clear Bill
-                </button>
-
-                <button type="button" class="btn secondary" id="saveBillBtn">
-                    Save Bill
-                </button>
-
-                <button type="button" class="btn primary large" id="printBillBtn">
-                    Print Bill
-                </button>
+                <button type="button" class="btn secondary" id="clearBillBtn">Clear Bill</button>
+                <button type="button" class="btn secondary" id="saveBillBtn">Save Bill</button>
+                <button type="button" class="btn primary large" id="printBillBtn">Print Bill</button>
             </div>
 
         </section>
 
-
-        <!-- ======================================
-             RIGHT SIDEBAR
-        ======================================= -->
+        <!-- RIGHT SIDEBAR -->
         <aside class="billing-sidebar">
-
-            <!-- TODAY'S SALES -->
             <div class="dashboard-card">
                 <div class="card-heading">
                     <div>
@@ -254,8 +228,6 @@
                 </div>
             </div>
 
-
-            <!-- QUICK ACTIONS -->
             <div class="dashboard-card">
                 <div class="card-heading">
                     <div>
@@ -265,26 +237,13 @@
                 </div>
 
                 <div class="quick-actions">
-                    <button type="button" id="addProductBtn">
-                        <span aria-hidden="true">＋</span> Add Product
-                    </button>
-
-                    <button type="button" id="importExcelBtn">
-                        <span aria-hidden="true">⇧</span> Import Excel
-                    </button>
-
-                    <button type="button" id="viewSalesBtn">
-                        <span aria-hidden="true">▤</span> View Sales
-                    </button>
-
-                    <button type="button" id="settingsBtn">
-                        <span aria-hidden="true">⚙</span> Settings
-                    </button>
+                    <button type="button" id="addProductBtn"><span aria-hidden="true">＋</span> Add Product</button>
+                    <button type="button" id="importExcelBtn"><span aria-hidden="true">⇧</span> Import Excel</button>
+                    <button type="button" id="viewSalesBtn"><span aria-hidden="true">▤</span> View Sales</button>
+                    <button type="button" id="settingsBtn"><span aria-hidden="true">⚙</span> Settings</button>
                 </div>
             </div>
 
-
-            <!-- INVENTORY STATUS -->
             <div class="dashboard-card">
                 <div class="card-heading">
                     <div>
@@ -298,27 +257,21 @@
                         <span>Total Products</span>
                         <strong id="totalProducts">0</strong>
                     </div>
-
                     <div class="stock-row">
                         <span>Low Stock</span>
                         <strong id="lowStock">0</strong>
                     </div>
-
                     <div class="stock-row">
                         <span>Out of Stock</span>
                         <strong id="outOfStock">0</strong>
                     </div>
                 </div>
             </div>
-
         </aside>
 
     </main>
 
-
-    <!-- ==========================================
-         PRODUCT MODAL
-    =========================================== -->
+    <!-- PRODUCT MODAL -->
     <div class="modal-overlay" id="productModal" hidden aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
         <div class="modal">
             <div class="modal-header">
@@ -326,45 +279,24 @@
                     <span class="section-label">PRODUCT</span>
                     <h2 id="modalTitle">Add Product</h2>
                 </div>
-                <button type="button" class="modal-close" id="closeProductModal" aria-label="Close modal">
-                    ×
-                </button>
+                <button type="button" class="modal-close" id="closeProductModal" aria-label="Close modal">×</button>
             </div>
 
             <form id="productForm">
                 <div class="form-group">
                     <label for="productName">Product Name</label>
-                    <input
-                        type="text"
-                        id="productName"
-                        placeholder="Example: Aashirvaad Atta 5kg"
-                        required
-                    >
+                    <input type="text" id="productName" placeholder="Example: Aashirvaad Atta 5kg" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="productMrp">MRP</label>
-                        <input
-                            type="number"
-                            id="productMrp"
-                            placeholder="0.00"
-                            min="0"
-                            step="0.01"
-                            required
-                        >
+                        <input type="number" id="productMrp" placeholder="0.00" min="0" step="0.01" required>
                     </div>
 
                     <div class="form-group">
                         <label for="productSalePrice">Sale Price</label>
-                        <input
-                            type="number"
-                            id="productSalePrice"
-                            placeholder="0.00"
-                            min="0"
-                            step="0.01"
-                            required
-                        >
+                        <input type="number" id="productSalePrice" placeholder="0.00" min="0" step="0.01" required>
                     </div>
                 </div>
 
@@ -382,30 +314,18 @@
 
                     <div class="form-group">
                         <label for="productCategory">Category</label>
-                        <input
-                            type="text"
-                            id="productCategory"
-                            placeholder="Example: Rice"
-                        >
+                        <input type="text" id="productCategory" placeholder="Example: Rice">
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn secondary" id="cancelProductBtn">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn primary">
-                        Save Product
-                    </button>
+                    <button type="button" class="btn secondary" id="cancelProductBtn">Cancel</button>
+                    <button type="submit" class="btn primary">Save Product</button>
                 </div>
             </form>
         </div>
     </div>
 
-
-    <!-- ==========================================
-         JAVASCRIPT LIBRARIES & APP CODE
-    =========================================== -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="app.js"></script>
 
