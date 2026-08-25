@@ -1,1928 +1,538 @@
 /* =========================================================
    SRI RAGHAVENDRA GROCERY
    BILLING & INVENTORY SYSTEM
-   Application JavaScript
+   Application JavaScript (Complete Engine)
 ========================================================= */
 
-
-/* =========================================================
-   1. SAMPLE PRODUCT DATABASE
-   ---------------------------------------------------------
-   These are temporary products for testing.
-   Later, we will replace/import these using Excel.
-========================================================= */
-
+/* Default Product Database */
 let products = [
-    {
-        id: 1,
-        name: "Aashirvaad Atta 5kg",
-        mrp: 320,
-        salePrice: 300,
-        unit: "piece",
-        category: "Atta"
-    },
-
-    {
-        id: 2,
-        name: "India Gate Basmati Rice 5kg",
-        mrp: 650,
-        salePrice: 610,
-        unit: "piece",
-        category: "Rice"
-    },
-
-    {
-        id: 3,
-        name: "Sugar",
-        mrp: 52,
-        salePrice: 48,
-        unit: "kg",
-        category: "Grocery"
-    },
-
-    {
-        id: 4,
-        name: "Toor Dal 1kg",
-        mrp: 180,
-        salePrice: 165,
-        unit: "piece",
-        category: "Dal"
-    },
-
-    {
-        id: 5,
-        name: "Tata Salt 1kg",
-        mrp: 30,
-        salePrice: 28,
-        unit: "piece",
-        category: "Grocery"
-    },
-
-    {
-        id: 6,
-        name: "Fortune Sunflower Oil 1L",
-        mrp: 145,
-        salePrice: 132,
-        unit: "piece",
-        category: "Oil"
-    },
-
-    {
-        id: 7,
-        name: "Bru Coffee 100g",
-        mrp: 110,
-        salePrice: 102,
-        unit: "piece",
-        category: "Beverages"
-    },
-
-    {
-        id: 8,
-        name: "Parle-G Biscuits",
-        mrp: 20,
-        salePrice: 18,
-        unit: "piece",
-        category: "Biscuits"
-    }
+    { id: 1, name: "Aashirvaad Atta 5kg", mrp: 320, salePrice: 300, unit: "piece", category: "Atta" },
+    { id: 2, name: "India Gate Basmati Rice 5kg", mrp: 650, salePrice: 610, unit: "piece", category: "Rice" },
+    { id: 3, name: "Sugar", mrp: 52, salePrice: 48, unit: "kg", category: "Grocery" },
+    { id: 4, name: "Toor Dal 1kg", mrp: 180, salePrice: 165, unit: "piece", category: "Dal" },
+    { id: 5, name: "Tata Salt 1kg", mrp: 30, salePrice: 28, unit: "piece", category: "Grocery" },
+    { id: 6, name: "Fortune Sunflower Oil 1L", mrp: 145, salePrice: 132, unit: "piece", category: "Oil" },
+    { id: 7, name: "Bru Coffee 100g", mrp: 110, salePrice: 102, unit: "piece", category: "Beverages" },
+    { id: 8, name: "Parle-G Biscuits", mrp: 20, salePrice: 18, unit: "piece", category: "Biscuits" }
 ];
-
-
-/* =========================================================
-   2. CURRENT BILL
-========================================================= */
 
 let currentBill = [];
 
+/* DOM Element References */
+let productSearch, searchResults, billedItemsSearch, billItems;
+let itemCount, totalMrp, totalSavings, grandTotal;
+let invoiceNumber, invoiceDate, customerPhone, customerName, paymentMethod;
+let todaySales, todayBills, todayItems, totalProducts, lowStock, outOfStock;
 
-/* =========================================================
-   3. DOM ELEMENTS
-========================================================= */
-
-const productSearch =
-    document.getElementById("productSearch");
-
-const searchResults =
-    document.getElementById("searchResults");
-
-const billItems =
-    document.getElementById("billItems");
-
-const itemCount =
-    document.getElementById("itemCount");
-
-const totalMrp =
-    document.getElementById("totalMrp");
-
-const totalSavings =
-    document.getElementById("totalSavings");
-
-const grandTotal =
-    document.getElementById("grandTotal");
-
-const invoiceNumber =
-    document.getElementById("invoiceNumber");
-
-const invoiceDate =
-    document.getElementById("invoiceDate");
-
-const customerPhone =
-    document.getElementById("customerPhone");
-
-const customerName =
-    document.getElementById("customerName");
-
-const paymentMethod =
-    document.getElementById("paymentMethod");
-
-const todaySales =
-    document.getElementById("todaySales");
-
-const todayBills =
-    document.getElementById("todayBills");
-
-const todayItems =
-    document.getElementById("todayItems");
-
-const totalProducts =
-    document.getElementById("totalProducts");
-
-const lowStock =
-    document.getElementById("lowStock");
-
-const outOfStock =
-    document.getElementById("outOfStock");
-
-
-/* =========================================================
-   4. APPLICATION START
-========================================================= */
-
+/* Initialize Application */
 document.addEventListener("DOMContentLoaded", () => {
-
+    initElements();
+    loadProducts();
     setInvoiceNumber();
-
     setInvoiceDate();
-
     updateInventoryStats();
-
+    updateSalesDashboard();
     renderBill();
-
     setupEventListeners();
-
 });
 
+/* Bind DOM Elements safely */
+function initElements() {
+    productSearch = document.getElementById("productSearch");
+    searchResults = document.getElementById("searchResults");
+    billedItemsSearch = document.getElementById("billedItemsSearch");
+    billItems = document.getElementById("billItems");
+    
+    itemCount = document.getElementById("itemCount");
+    totalMrp = document.getElementById("totalMrp");
+    totalSavings = document.getElementById("totalSavings");
+    grandTotal = document.getElementById("grandTotal");
+    
+    invoiceNumber = document.getElementById("invoiceNumber");
+    invoiceDate = document.getElementById("invoiceDate");
+    customerPhone = document.getElementById("customerPhone");
+    customerName = document.getElementById("customerName");
+    paymentMethod = document.getElementById("paymentMethod");
+    
+    todaySales = document.getElementById("todaySales");
+    todayBills = document.getElementById("todayBills");
+    todayItems = document.getElementById("todayItems");
+    totalProducts = document.getElementById("totalProducts");
+    lowStock = document.getElementById("lowStock");
+    outOfStock = document.getElementById("outOfStock");
+}
 
-/* =========================================================
-   5. EVENT LISTENERS
-========================================================= */
-
+/* Event Listeners Setup */
 function setupEventListeners() {
+    if (productSearch) productSearch.addEventListener("input", handleProductSearch);
+    if (billedItemsSearch) billedItemsSearch.addEventListener("input", renderBill);
 
-    /* Product search */
-
-    productSearch.addEventListener(
-        "input",
-        handleProductSearch
-    );
-
-   /* Search Billed Items */
-    const billedSearchInput = document.getElementById("billedItemsSearch");
-    if (billedSearchInput) {
-    billedSearchInput.addEventListener("input", renderBill);
-    }
-
-
-    /* Clear search when clicking outside */
-
+    // Close search dropdown when clicking outside
     document.addEventListener("click", (event) => {
-
-        if (
-            !event.target.closest(".product-search-section")
-        ) {
-
+        if (!event.target.closest(".product-search-section")) {
             hideSearchResults();
-
         }
-
     });
 
+    // Action Buttons
+    bindClick("clearBillBtn", clearBill);
+    bindClick("printBillBtn", printBill);
+    bindClick("saveBillBtn", saveBill);
+    bindClick("newBillBtn", newBill);
+    bindClick("scanBtn", () => alert("Barcode scanner functionality will be integrated with camera/scanner input."));
 
-    /* Clear Bill */
+    // Table Actions (Quantity & Remove)
+    if (billItems) billItems.addEventListener("click", handleBillItemClick);
 
-    document
-        .getElementById("clearBillBtn")
-        .addEventListener("click", clearBill);
+    // Modal Events
+    bindClick("addProductBtn", openProductModal);
+    bindClick("productsBtn", openProductModal);
+    bindClick("closeProductModal", closeProductModal);
+    bindClick("cancelProductBtn", closeProductModal);
+    
+    const productForm = document.getElementById("productForm");
+    if (productForm) productForm.addEventListener("submit", addNewProduct);
 
-   /* Bill quantity and remove buttons */
+    bindClick("importExcelBtn", importExcel);
 
-    billItems.addEventListener("click", handleBillItemClick);
-
-
-    /* Print Bill */
-
-    document
-        .getElementById("printBillBtn")
-        .addEventListener("click", printBill);
-
-
-    /* Save Bill */
-
-    document
-        .getElementById("saveBillBtn")
-        .addEventListener("click", saveBill);
-
-
-    /* New Bill */
-
-    document
-        .getElementById("newBillBtn")
-        .addEventListener("click", newBill);
-
-
-    /* Scan */
-
-    document
-        .getElementById("scanBtn")
-        .addEventListener("click", () => {
-
-            alert(
-                "Barcode scanner functionality will be added later."
-            );
-
-        });
-
-
-    /* Add Product */
-
-    document
-        .getElementById("addProductBtn")
-        .addEventListener(
-            "click",
-            openProductModal
-        );
-
-
-    /* Products header */
-
-    document
-        .getElementById("productsBtn")
-        .addEventListener("click", () => {
-
-            openProductModal();
-
-        });
-
-
-    /* Close product modal */
-
-    document
-        .getElementById("closeProductModal")
-        .addEventListener(
-            "click",
-            closeProductModal
-        );
-
-
-    /* Cancel product */
-
-    document
-        .getElementById("cancelProductBtn")
-        .addEventListener(
-            "click",
-            closeProductModal
-        );
-
-
-    /* Product form */
-
-    document
-        .getElementById("productForm")
-        .addEventListener(
-            "submit",
-            addNewProduct
-        );
-
-
-    /* Import Excel */
-
-    document
-        .getElementById("importExcelBtn")
-        .addEventListener(
-            "click",
-            importExcel
-        );
-
-
-    /* View Sales */
-
-    document
-        .getElementById("viewSalesBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                alert(
-                    "Sales history will be added in the next stage."
-                );
-
-            }
-        );
-
-
-    /* Sales header */
-
-    document
-        .getElementById("salesBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                alert(
-                    "Sales history will be added in the next stage."
-                );
-
-            }
-        );
-
-
-    /* Settings */
-
-    document
-        .getElementById("settingsBtn")
-        .addEventListener(
-            "click",
-            () => {
-
-                alert(
-                    "Settings will be added later."
-                );
-
-            }
-        );
-
+    // Placeholders for secondary navigation
+    const notImplemented = () => alert("This module will be available in the next release.");
+    bindClick("viewSalesBtn", notImplemented);
+    bindClick("salesBtn", notImplemented);
+    bindClick("settingsBtn", notImplemented);
 }
 
-/* =========================================================
-   BILL ITEM BUTTON HANDLER (FIXED)
-========================================================= */
-
-function handleBillItemClick(event) {
-
-    const button =
-        event.target.closest("button");
-
-    if (!button) return;
-
-
-    /* Increase / decrease quantity */
-
-    if (
-        button.classList.contains("quantity-btn")
-    ) {
-
-        const id = button.dataset.id; // Retain original type string/number
-
-        const action =
-            button.dataset.action;
-
-        // FIXED: Loose comparison (==) allows string and numeric IDs to match
-        const item =
-            currentBill.find(
-                product => product.id == id
-            );
-
-        if (!item) return;
-
-
-        if (action === "increase") {
-
-            item.quantity += 1;
-
-        }
-
-
-        if (action === "decrease") {
-
-            item.quantity -= 1;
-
-
-            if (item.quantity <= 0) {
-
-                removeProduct(id);
-
-                return;
-
-            }
-
-        }
-
-
-        renderBill();
-
-        return;
-
-    }
-
-
-    /* Remove product */
-
-    if (
-        button.classList.contains("remove-item")
-    ) {
-
-        const id = button.dataset.id;
-
-        removeProduct(id);
-
-    }
-
+function bindClick(id, handler) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", handler);
 }
-/* =========================================================
-   6. INVOICE NUMBER
-========================================================= */
 
+/* Header Invoice Meta */
 function setInvoiceNumber() {
-
-    let savedNumber =
-        Number(
-            localStorage.getItem(
-                "groceryInvoiceNumber"
-            )
-        ) || 1;
-
-
-    invoiceNumber.textContent =
-        "#" +
-        String(savedNumber).padStart(6, "0");
-
+    if (!invoiceNumber) return;
+    let savedNumber = Number(localStorage.getItem("groceryInvoiceNumber")) || 1;
+    invoiceNumber.textContent = "#" + String(savedNumber).padStart(6, "0");
 }
-
-
-/* =========================================================
-   7. INVOICE DATE
-========================================================= */
 
 function setInvoiceDate() {
-
+    if (!invoiceDate) return;
     const now = new Date();
-
-    const date =
-        now.toLocaleDateString(
-            "en-IN",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-            }
-        );
-
-
-    invoiceDate.textContent = date;
-
+    invoiceDate.textContent = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-
-/* =========================================================
-   8. PRODUCT SEARCH
-========================================================= */
-
+/* Product Search Dropdown */
 function handleProductSearch() {
-
-    const searchTerm =
-        productSearch.value
-            .trim()
-            .toLowerCase();
-
-
+    const searchTerm = productSearch.value.trim().toLowerCase();
     if (!searchTerm) {
-
         hideSearchResults();
-
         return;
-
     }
-
-
-    const matches =
-        products.filter(product =>
-
-            product.name
-                .toLowerCase()
-                .includes(searchTerm)
-
-        );
-
-
+    const matches = products.filter(product => 
+        product.name.toLowerCase().includes(searchTerm) || 
+        product.category.toLowerCase().includes(searchTerm)
+    );
     displaySearchResults(matches);
-
 }
-
-
-/* =========================================================
-   9. DISPLAY SEARCH RESULTS
-========================================================= */
 
 function displaySearchResults(matches) {
-
+    if (!searchResults) return;
     searchResults.innerHTML = "";
 
-
     if (matches.length === 0) {
-
-        searchResults.innerHTML = `
-
-            <div style="
-                padding:16px;
-                text-align:center;
-                color:#929b99;
-                font-size:12px;
-            ">
-
-                No products found
-
-            </div>
-
-        `;
-
+        searchResults.innerHTML = `<div style="padding:14px;text-align:center;color:#929b99;font-size:12px;">No products found</div>`;
         searchResults.style.display = "block";
-
         return;
-
     }
-
 
     matches.forEach(product => {
-
-        const result =
-            document.createElement("button");
-
-
+        const result = document.createElement("button");
         result.type = "button";
-
-        result.style.cssText = `
-            width:100%;
-            padding:12px 14px;
-            border:0;
-            border-bottom:1px solid #eef1f0;
-            background:#fff;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:15px;
-            text-align:left;
-            cursor:pointer;
-        `;
-
-
+        result.style.cssText = "width:100%;padding:10px 14px;border:0;border-bottom:1px solid #eef1f0;background:#fff;display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;";
         result.innerHTML = `
-
             <div>
-
-                <strong style="
-                    display:block;
-                    font-size:12px;
-                    color:#1b2422;
-                    margin-bottom:2px;
-                ">
-                    ${escapeHTML(product.name)}
-                </strong>
-
-                <span style="
-                    font-size:10px;
-                    color:#929b99;
-                ">
-                    ${escapeHTML(product.category)}
-                    ·
-                    ${escapeHTML(product.unit)}
-                </span>
-
+                <strong style="display:block;font-size:12px;color:#1b2422;">${escapeHTML(product.name)}</strong>
+                <span style="font-size:10px;color:#929b99;">${escapeHTML(product.category)} · ${escapeHTML(product.unit)}</span>
             </div>
-
-
-            <div style="
-                text-align:right;
-                white-space:nowrap;
-            ">
-
-                <strong style="
-                    display:block;
-                    font-size:12px;
-                    color:#176b5b;
-                ">
-                    ₹${formatMoney(product.salePrice)}
-                </strong>
-
-                <span style="
-                    font-size:10px;
-                    color:#929b99;
-                    text-decoration:line-through;
-                ">
-                    ₹${formatMoney(product.mrp)}
-                </span>
-
+            <div style="text-align:right;">
+                <strong style="display:block;font-size:12px;color:#176b5b;">₹${formatMoney(product.salePrice)}</strong>
+                <span style="font-size:10px;color:#929b99;text-decoration:line-through;">₹${formatMoney(product.mrp)}</span>
             </div>
-
         `;
-
-
-        result.addEventListener(
-            "mouseenter",
-            () => {
-
-                result.style.background =
-                    "#f4faf8";
-
-            }
-        );
-
-
-        result.addEventListener(
-            "mouseleave",
-            () => {
-
-                result.style.background =
-                    "#fff";
-
-            }
-        );
-
-
-        result.addEventListener(
-            "click",
-            () => {
-
-                addProductToBill(product);
-
-            }
-        );
-
-
+        result.addEventListener("click", () => addProductToBill(product));
         searchResults.appendChild(result);
-
     });
 
-
     searchResults.style.display = "block";
-
 }
 
+function hideSearchResults() {
+    if (searchResults) searchResults.style.display = "none";
+}
 
-/* =========================================================
-   10. ADD PRODUCT TO BILL (FIXED)
-========================================================= */
-
+/* Add Item to Active Bill */
 function addProductToBill(product) {
-
-    // FIXED: Loose comparison (==) handles string vs integer IDs
-    const existing =
-        currentBill.find(
-            item => item.id == product.id
-        );
-
-
+    const existing = currentBill.find(item => item.id === product.id);
     if (existing) {
-
         existing.quantity += 1;
-
     } else {
-
         currentBill.push({
-
             id: product.id,
-
             name: product.name,
-
             mrp: Number(product.mrp),
-
             salePrice: Number(product.salePrice),
-
             unit: product.unit,
-
             category: product.category,
-
             quantity: 1
-
         });
+    }
+    if (productSearch) productSearch.value = "";
+    hideSearchResults();
+    renderBill();
+}
 
+/* Bill Item Actions (Delegated) */
+function handleBillItemClick(event) {
+    const button = event.target.closest("button");
+    if (!button) return;
+
+    const id = Number(button.dataset.id);
+    const item = currentBill.find(product => product.id === id);
+
+    if (button.classList.contains("quantity-btn")) {
+        const action = button.dataset.action;
+        if (!item) return;
+
+        if (action === "increase") item.quantity += 1;
+        if (action === "decrease") {
+            item.quantity -= 1;
+            if (item.quantity <= 0) {
+                removeProduct(id);
+                return;
+            }
+        }
+        renderBill();
     }
 
-
-    productSearch.value = "";
-
-    hideSearchResults();
-
-    renderBill();
-
+    if (button.classList.contains("remove-item")) {
+        removeProduct(id);
+    }
 }
 
+function removeProduct(id) {
+    currentBill = currentBill.filter(item => item.id !== id);
+    renderBill();
+}
 
-/* =========================================================
-   11. RENDER BILL (WITH FILTERING)
-========================================================= */
-
+/* Render Bill Table & Filter */
 function renderBill() {
-
+    if (!billItems) return;
     billItems.innerHTML = "";
 
-    if (currentBill.length === 0) {
+    const filterTerm = billedItemsSearch ? billedItemsSearch.value.trim().toLowerCase() : "";
+    const visibleItems = currentBill.filter(item => item.name.toLowerCase().includes(filterTerm));
 
+    if (visibleItems.length === 0) {
         billItems.innerHTML = `
             <tr class="empty-bill">
                 <td colspan="7">
                     <div class="empty-state">
                         <div class="empty-icon">🛒</div>
-                        <h4>No products added</h4>
-                        <p>Search for a product above to start the bill.</p>
+                        <h4 style="font-size:14px;color:#1b2422;">${currentBill.length === 0 ? 'No products added yet' : 'No matching item found'}</h4>
+                        <p style="font-size:11px;color:#929b99;margin-top:4px;">${currentBill.length === 0 ? 'Search for a product above to start billing.' : 'Try a different search term.'}</p>
                     </div>
                 </td>
             </tr>
         `;
-
         updateTotals();
         return;
-
     }
 
-    /* Read search query for already billed items */
-    const searchInput = document.getElementById("billedItemsSearch");
-    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : "";
-
-    /* Filter items based on search term */
-    const filteredItems = currentBill.filter(item =>
-        item.name.toLowerCase().includes(searchTerm) ||
-        (item.category && item.category.toLowerCase().includes(searchTerm))
-    );
-
-    /* Display empty state if search yields no results */
-    if (filteredItems.length === 0) {
-
-        billItems.innerHTML = `
-            <tr class="empty-bill">
-                <td colspan="7">
-                    <div class="empty-state" style="padding: 24px 20px;">
-                        <p style="color: var(--text-muted); font-size: 12px;">
-                            No billed items match "<strong>${escapeHTML(searchTerm)}</strong>"
-                        </p>
-                    </div>
-                </td>
-            </tr>
-        `;
-
-        updateTotals();
-        return;
-
-    }
-
-    /* Render filtered items */
-    filteredItems.forEach(item => {
-
+    visibleItems.forEach(item => {
         const row = document.createElement("tr");
-
         const itemDiscount = (item.mrp - item.salePrice) * item.quantity;
         const itemAmount = item.salePrice * item.quantity;
 
         row.innerHTML = `
             <td>
-                <div style="font-weight:700; font-size:12px;">
-                    ${escapeHTML(item.name)}
-                </div>
-                <div style="font-size:9px; color:#929b99; margin-top:2px;">
-                    ${escapeHTML(item.unit)}
-                </div>
+                <div style="font-weight:700;font-size:12px;">${escapeHTML(item.name)}</div>
+                <div style="font-size:9px;color:#929b99;">${escapeHTML(item.unit)}</div>
             </td>
-
             <td>
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <button
-                        type="button"
-                        class="quantity-btn"
-                        data-action="decrease"
-                        data-id="${item.id}"
-                        style="width:25px; height:25px; border:1px solid #e4e9e7; border-radius:6px; background:#fff; cursor:pointer;"
-                    >
-                        −
-                    </button>
-
-                    <strong style="min-width:20px; text-align:center;">
-                        ${item.quantity}
-                    </strong>
-
-                    <button
-                        type="button"
-                        class="quantity-btn"
-                        data-action="increase"
-                        data-id="${item.id}"
-                        style="width:25px; height:25px; border:1px solid #e4e9e7; border-radius:6px; background:#fff; cursor:pointer;"
-                    >
-                        +
-                    </button>
+                <div style="display:flex;align-items:center;gap:5px;">
+                    <button type="button" class="quantity-btn" data-action="decrease" data-id="${item.id}" style="width:24px;height:24px;border:1px solid #e4e9e7;border-radius:4px;background:#fff;cursor:pointer;">−</button>
+                    <strong style="min-width:18px;text-align:center;">${item.quantity}</strong>
+                    <button type="button" class="quantity-btn" data-action="increase" data-id="${item.id}" style="width:24px;height:24px;border:1px solid #e4e9e7;border-radius:4px;background:#fff;cursor:pointer;">+</button>
                 </div>
             </td>
-
             <td>₹${formatMoney(item.mrp)}</td>
             <td><strong>₹${formatMoney(item.salePrice)}</strong></td>
-
-            <td>
-                <span style="color:#16855f; font-weight:700;">
-                    ₹${formatMoney(itemDiscount)}
-                </span>
-            </td>
-
+            <td><span style="color:#16855f;font-weight:700;">₹${formatMoney(itemDiscount)}</span></td>
             <td><strong>₹${formatMoney(itemAmount)}</strong></td>
-
             <td>
-                <button
-                    type="button"
-                    class="remove-item"
-                    data-id="${item.id}"
-                    style="width:28px; height:28px; border:0; border-radius:7px; background:#fff0ef; color:#d9534f; font-size:15px; cursor:pointer;"
-                    title="Remove"
-                >
-                    ×
-                </button>
+                <button type="button" class="remove-item" data-id="${item.id}" style="width:26px;height:26px;border:0;border-radius:6px;background:#fff0ef;color:#d9534f;font-size:14px;cursor:pointer;">×</button>
             </td>
         `;
-
         billItems.appendChild(row);
-
     });
 
     updateTotals();
-
 }
 
-
-/* =========================================================
-   12. QUANTITY CHANGE (FIXED)
-========================================================= */
-
-function handleQuantityChange(event) {
-
-    const id = event.currentTarget.dataset.id;
-
-
-    const action =
-        event.currentTarget.dataset.action;
-
-
-    // FIXED: Loose comparison (==) allows matching across types
-    const item =
-        currentBill.find(
-            product => product.id == id
-        );
-
-
-    if (!item) return;
-
-
-    if (action === "increase") {
-
-        item.quantity += 1;
-
-    }
-
-
-    if (action === "decrease") {
-
-        item.quantity -= 1;
-
-
-        if (item.quantity <= 0) {
-
-            removeProduct(id);
-
-            return;
-
-        }
-
-    }
-
-
-    renderBill();
-
-}
-
-
-/* =========================================================
-   13. REMOVE PRODUCT (FIXED)
-========================================================= */
-
-function removeProduct(id) {
-
-    // FIXED: Loose inequality (!=) preserves non-matching IDs regardless of type
-    currentBill =
-        currentBill.filter(
-            item => item.id != id
-        );
-
-
-    renderBill();
-
-}
-
-
-/* =========================================================
-   14. CALCULATE TOTALS
-========================================================= */
-
-/* =========================================================
-   CALCULATE TOTALS & UPDATE BANNER
-========================================================= */
-
+/* Calculate Totals and Update Savings Banner */
 function updateTotals() {
-
     let mrpTotal = 0;
     let saleTotal = 0;
-    let totalItems = 0;
+    let totalQty = 0;
 
     currentBill.forEach(item => {
         mrpTotal += item.mrp * item.quantity;
         saleTotal += item.salePrice * item.quantity;
-        totalItems += item.quantity;
+        totalQty += item.quantity;
     });
 
     const savings = mrpTotal - saleTotal;
 
-    totalMrp.textContent = "₹" + formatMoney(mrpTotal);
-    totalSavings.textContent = "₹" + formatMoney(savings);
-    grandTotal.textContent = "₹" + formatMoney(saleTotal);
-    itemCount.textContent = totalItems + (totalItems === 1 ? " Item" : " Items");
+    if (totalMrp) totalMrp.textContent = "₹" + formatMoney(mrpTotal);
+    if (totalSavings) totalSavings.textContent = "₹" + formatMoney(savings);
+    if (grandTotal) grandTotal.textContent = "₹" + formatMoney(saleTotal);
+    if (itemCount) itemCount.textContent = totalQty + (totalQty === 1 ? " Item" : " Items");
 
-    /* Banner logic */
+    // Dynamic Full Banner Update
     const thankYouBanner = document.getElementById("billThankYouBanner");
-    const savingsAmountSpan = document.getElementById("bannerSavingsAmount");
+    const bannerSavingsAmount = document.getElementById("bannerSavingsAmount");
 
-    if (thankYouBanner && savingsAmountSpan) {
+    if (thankYouBanner && bannerSavingsAmount) {
         if (currentBill.length > 0) {
-            savingsAmountSpan.textContent = "₹" + formatMoney(savings);
+            bannerSavingsAmount.textContent = "₹" + formatMoney(savings);
             thankYouBanner.style.display = "block";
         } else {
             thankYouBanner.style.display = "none";
         }
     }
-
 }
 
-/* =========================================================
-   15. CLEAR BILL
-========================================================= */
-
+/* Clear, Save, and New Bill Actions */
 function clearBill() {
+    if (currentBill.length === 0) return;
+    if (!confirm("Are you sure you want to clear the current bill?")) return;
 
-    if (currentBill.length === 0) {
-
-        return;
-
-    }
-
-
-    const confirmed =
-        confirm(
-            "Are you sure you want to clear this bill?"
-        );
-
-
-    if (!confirmed) return;
-
-
-    currentBill = [];
-
-    customerPhone.value = "";
-
-    customerName.value = "";
-
-    paymentMethod.value = "cash";
-
-    productSearch.value = "";
-
-    hideSearchResults();
-
-    renderBill();
-
+    resetBillState();
 }
-
-
-/* =========================================================
-   16. NEW BILL
-========================================================= */
 
 function newBill() {
+    if (currentBill.length > 0 && !confirm("Start a new bill? The current unsaved bill will be cleared.")) return;
 
-    if (currentBill.length > 0) {
-
-        const confirmed =
-            confirm(
-                "Start a new bill? The current bill will be cleared."
-            );
-
-
-        if (!confirmed) return;
-
-    }
-
-
-    currentBill = [];
-
-    customerPhone.value = "";
-
-    customerName.value = "";
-
-    paymentMethod.value = "cash";
-
-    productSearch.value = "";
-
-    hideSearchResults();
-
+    resetBillState();
     setInvoiceNumber();
-
     setInvoiceDate();
-
-    renderBill();
-
 }
 
-
-/* =========================================================
-   17. SAVE BILL
-========================================================= */
+function resetBillState() {
+    currentBill = [];
+    if (customerPhone) customerPhone.value = "";
+    if (customerName) customerName.value = "";
+    if (paymentMethod) paymentMethod.value = "cash";
+    if (productSearch) productSearch.value = "";
+    if (billedItemsSearch) billedItemsSearch.value = "";
+    hideSearchResults();
+    renderBill();
+}
 
 function saveBill() {
-
     if (currentBill.length === 0) {
-
-        alert(
-            "Please add at least one product before saving the bill."
-        );
-
+        alert("Please add at least one product before saving.");
         return;
-
     }
-
 
     const bill = {
-
-        invoiceNumber:
-            invoiceNumber.textContent,
-
-        date:
-            new Date().toISOString(),
-
-        customerPhone:
-            customerPhone.value.trim(),
-
-        customerName:
-            customerName.value.trim(),
-
-        paymentMethod:
-            paymentMethod.value,
-
-        items:
-            currentBill.map(item => ({
-                ...item
-            })),
-
-        totalMrp:
-            calculateMrpTotal(),
-
-        savings:
-            calculateSavings(),
-
-        grandTotal:
-            calculateGrandTotal()
-
+        invoiceNumber: invoiceNumber ? invoiceNumber.textContent : "#000001",
+        date: new Date().toISOString(),
+        customerPhone: customerPhone ? customerPhone.value.trim() : "",
+        customerName: customerName ? customerName.value.trim() : "",
+        paymentMethod: paymentMethod ? paymentMethod.value : "cash",
+        items: [...currentBill],
+        totalMrp: currentBill.reduce((s, i) => s + i.mrp * i.quantity, 0),
+        savings: currentBill.reduce((s, i) => s + (i.mrp - i.salePrice) * i.quantity, 0),
+        grandTotal: currentBill.reduce((s, i) => s + i.salePrice * i.quantity, 0)
     };
 
-
-    let savedBills =
-        JSON.parse(
-            localStorage.getItem(
-                "groceryBills"
-            )
-        ) || [];
-
-
+    let savedBills = JSON.parse(localStorage.getItem("groceryBills")) || [];
     savedBills.push(bill);
+    localStorage.setItem("groceryBills", JSON.stringify(savedBills));
 
+    const currentNum = Number(localStorage.getItem("groceryInvoiceNumber")) || 1;
+    localStorage.setItem("groceryInvoiceNumber", currentNum + 1);
 
-    localStorage.setItem(
-        "groceryBills",
-        JSON.stringify(savedBills)
-    );
-
-
-    /* Increase invoice number */
-
-    const currentNumber =
-        Number(
-            localStorage.getItem(
-                "groceryInvoiceNumber"
-            )
-        ) || 1;
-
-
-    localStorage.setItem(
-        "groceryInvoiceNumber",
-        currentNumber + 1
-    );
-
-
-    alert(
-        "Bill saved successfully!"
-    );
-
-
+    alert("Bill saved successfully!");
     updateSalesDashboard();
-
 }
-
-
-/* =========================================================
-   18. CALCULATE MRP TOTAL
-========================================================= */
-
-function calculateMrpTotal() {
-
-    return currentBill.reduce(
-        (total, item) => {
-
-            return total +
-                item.mrp *
-                item.quantity;
-
-        },
-        0
-    );
-
-}
-
-
-/* =========================================================
-   19. CALCULATE GRAND TOTAL
-========================================================= */
-
-function calculateGrandTotal() {
-
-    return currentBill.reduce(
-        (total, item) => {
-
-            return total +
-                item.salePrice *
-                item.quantity;
-
-        },
-        0
-    );
-
-}
-
-
-/* =========================================================
-   20. CALCULATE SAVINGS
-========================================================= */
-
-function calculateSavings() {
-
-    return (
-        calculateMrpTotal() -
-        calculateGrandTotal()
-    );
-
-}
-
-
-/* =========================================================
-   21. PRINT BILL
-========================================================= */
 
 function printBill() {
-
     if (currentBill.length === 0) {
-
-        alert(
-            "Please add products before printing."
-        );
-
+        alert("Please add products to the bill before printing.");
         return;
-
     }
-
-
     window.print();
-
 }
 
-
-/* =========================================================
-   22. PRODUCT MODAL
-========================================================= */
-
+/* Modal and Product Management */
 function openProductModal() {
-
-    const modal =
-        document.getElementById(
-            "productModal"
-        );
-
-
-    modal.hidden = false;
-
-
-    setTimeout(() => {
-
-        document
-            .getElementById("productName")
-            .focus();
-
-    }, 100);
-
+    const modal = document.getElementById("productModal");
+    if (modal) {
+        modal.hidden = false;
+        setTimeout(() => {
+            const nameInput = document.getElementById("productName");
+            if (nameInput) nameInput.focus();
+        }, 100);
+    }
 }
-
 
 function closeProductModal() {
-
-    const modal =
-        document.getElementById(
-            "productModal"
-        );
-
-
-    modal.hidden = true;
-
-
-    document
-        .getElementById("productForm")
-        .reset();
-
+    const modal = document.getElementById("productModal");
+    if (modal) modal.hidden = true;
+    const form = document.getElementById("productForm");
+    if (form) form.reset();
 }
-
-
-/* =========================================================
-   23. ADD NEW PRODUCT
-========================================================= */
 
 function addNewProduct(event) {
-
     event.preventDefault();
+    const name = document.getElementById("productName").value.trim();
+    const mrp = Number(document.getElementById("productMrp").value);
+    const salePrice = Number(document.getElementById("productSalePrice").value);
+    const unit = document.getElementById("productUnit").value;
+    const category = document.getElementById("productCategory").value.trim();
 
-
-    const name =
-        document
-            .getElementById("productName")
-            .value
-            .trim();
-
-
-    const mrp =
-        Number(
-            document
-                .getElementById("productMrp")
-                .value
-        );
-
-
-    const salePrice =
-        Number(
-            document
-                .getElementById("productSalePrice")
-                .value
-        );
-
-
-    const unit =
-        document
-            .getElementById("productUnit")
-            .value;
-
-
-    const category =
-        document
-            .getElementById("productCategory")
-            .value
-            .trim();
-
-
-    if (!name) {
-
-        alert(
-            "Please enter the product name."
-        );
-
+    if (!name || isNaN(mrp) || isNaN(salePrice) || salePrice > mrp) {
+        alert("Please enter valid product details. Sale Price cannot exceed MRP.");
         return;
-
     }
 
-
-    if (salePrice > mrp) {
-
-        alert(
-            "Sale price cannot be higher than MRP."
-        );
-
-        return;
-
-    }
-
-
-    const newProduct = {
-
-        id:
-            Date.now(),
-
-        name:
-            name,
-
-        mrp:
-            mrp,
-
-        salePrice:
-            salePrice,
-
-        unit:
-            unit,
-
-        category:
-            category || "General"
-
-    };
-
-
-    products.push(
-        newProduct
-    );
-
-
-    saveProducts();
-
-
-    updateInventoryStats();
-
-
-    closeProductModal();
-
-
-    alert(
-        `${name} added successfully!`
-    );
-
-}
-
-
-/* =========================================================
-   24. SAVE PRODUCTS
-========================================================= */
-
-function saveProducts() {
-
-    localStorage.setItem(
-        "groceryProducts",
-        JSON.stringify(products)
-    );
-
-}
-
-
-/* =========================================================
-   25. LOAD PRODUCTS
-========================================================= */
-
-function loadProducts() {
-
-    const savedProducts =
-        localStorage.getItem(
-            "groceryProducts"
-        );
-
-
-    if (savedProducts) {
-
-        try {
-
-            products =
-                JSON.parse(
-                    savedProducts
-                );
-
-        } catch (error) {
-
-            console.error(
-                "Could not load saved products:",
-                error
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   26. INVENTORY STATISTICS
-========================================================= */
-
-function updateInventoryStats() {
-
-    totalProducts.textContent =
-        products.length;
-
-
-    /*
-       Stock management will be added later.
-       For now these remain zero.
-    */
-
-    lowStock.textContent = "0";
-
-    outOfStock.textContent = "0";
-
-}
-
-
-/* =========================================================
-   27. SALES DASHBOARD
-========================================================= */
-
-function updateSalesDashboard() {
-
-    const bills =
-        JSON.parse(
-            localStorage.getItem(
-                "groceryBills"
-            )
-        ) || [];
-
-
-    const today =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-
-    const todayBillsList =
-        bills.filter(bill => {
-
-            return bill.date
-                .split("T")[0] === today;
-
-        });
-
-
-    let sales = 0;
-
-    let items = 0;
-
-
-    todayBillsList.forEach(bill => {
-
-        sales +=
-            Number(
-                bill.grandTotal
-            );
-
-
-        bill.items.forEach(item => {
-
-            items +=
-                Number(
-                    item.quantity
-                );
-
-        });
-
+    products.push({
+        id: Date.now(),
+        name,
+        mrp,
+        salePrice,
+        unit: unit || "piece",
+        category: category || "General"
     });
 
-
-    todaySales.textContent =
-        "₹" + formatMoney(sales);
-
-
-    todayBills.textContent =
-        todayBillsList.length;
-
-
-    todayItems.textContent =
-        items;
-
+    saveProducts();
+    updateInventoryStats();
+    closeProductModal();
+    alert(`"${name}" added successfully to inventory!`);
 }
 
+function saveProducts() {
+    localStorage.setItem("groceryProducts", JSON.stringify(products));
+}
 
-/* =========================================================
-   28. IMPORT EXCEL
-   ---------------------------------------------------------
-   Placeholder for now.
-   We'll build the real Excel importer later.
-========================================================= */
+function loadProducts() {
+    const saved = localStorage.getItem("groceryProducts");
+    if (saved) {
+        try { products = JSON.parse(saved); } catch (e) { console.error("Could not load products", e); }
+    }
+}
 
+function updateInventoryStats() {
+    if (totalProducts) totalProducts.textContent = products.length;
+    if (lowStock) lowStock.textContent = "0";
+    if (outOfStock) outOfStock.textContent = "0";
+}
+
+function updateSalesDashboard() {
+    const bills = JSON.parse(localStorage.getItem("groceryBills")) || [];
+    const today = new Date().toISOString().split("T")[0];
+    const todayBillsList = bills.filter(bill => bill.date && bill.date.split("T")[0] === today);
+
+    let sales = 0, items = 0;
+    todayBillsList.forEach(bill => {
+        sales += Number(bill.grandTotal) || 0;
+        if (Array.isArray(bill.items)) {
+            bill.items.forEach(item => items += Number(item.quantity) || 0);
+        }
+    });
+
+    if (todaySales) todaySales.textContent = "₹" + formatMoney(sales);
+    if (todayBills) todayBills.textContent = todayBillsList.length;
+    if (todayItems) todayItems.textContent = items;
+}
+
+/* Excel Import Functionality */
 function importExcel() {
-
-    /* Check whether Excel library is available */
-
     if (typeof XLSX === "undefined") {
-
-        alert(
-            "Excel import library could not be loaded. Please check your internet connection and reload the page."
-        );
-
+        alert("SheetJS library missing. Please include xlsx.full.min.js to import Excel files.");
         return;
-
     }
 
-
-    /* Create hidden file input */
-
-    const fileInput =
-        document.createElement("input");
-
+    const fileInput = document.createElement("input");
     fileInput.type = "file";
-
-    fileInput.accept =
-        ".xlsx,.xls";
-
-    fileInput.style.display = "none";
-
-
-    /* When a file is selected */
-
-    fileInput.addEventListener(
-        "change",
-        handleExcelFile
-    );
-
-
+    fileInput.accept = ".xlsx,.xls";
+    fileInput.addEventListener("change", handleExcelFile);
     document.body.appendChild(fileInput);
-
     fileInput.click();
-
-
-    /* Remove temporary input */
-
-    setTimeout(() => {
-
-        fileInput.remove();
-
-    }, 1000);
-
+    setTimeout(() => fileInput.remove(), 1000);
 }
-
-
-/* =========================================================
-   EXCEL FILE PROCESSING
-========================================================= */
 
 function handleExcelFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    const file =
-        event.target.files[0];
-
-
-    if (!file) {
-
-        return;
-
-    }
-
-
-    const reader =
-        new FileReader();
-
-
+    const reader = new FileReader();
     reader.onload = function (excelEvent) {
-
         try {
-
-            const data =
-                new Uint8Array(
-                    excelEvent.target.result
-                );
-
-
-            const workbook =
-                XLSX.read(
-                    data,
-                    {
-                        type: "array"
-                    }
-                );
-
-
-            /* Use the first worksheet */
-
-            const firstSheetName =
-                workbook.SheetNames[0];
-
-
-            const worksheet =
-                workbook.Sheets[
-                    firstSheetName
-                ];
-
-
-            /* Convert Excel rows into objects */
-
-            const rows =
-                XLSX.utils.sheet_to_json(
-                    worksheet,
-                    {
-                        defval: ""
-                    }
-                );
-
+            const data = new Uint8Array(excelEvent.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
             if (rows.length === 0) {
-
-                alert(
-                    "The Excel file is empty."
-                );
-
+                alert("The selected Excel file is empty.");
                 return;
-
             }
-
 
             const importedProducts = [];
+            rows.forEach((row, index) => {
+                const name = String(row["Item Name"] || row["Name"] || "").trim();
+                const mrp = Number(row["MRP"]);
+                const salePrice = Number(row["Sale Price"] || row["Price"]);
 
-            const errors = [];
-
-
-            rows.forEach(
-                (row, index) => {
-
-                    const rowNumber =
-                        index + 2;
-
-
-                    const id =
-                        String(
-                            row["Item Code"]
-                        ).trim();
-
-
-                    const name =
-                        String(
-                            row["Item Name"]
-                        ).trim();
-
-
-                    const category =
-                        String(
-                            row["Category"]
-                        ).trim();
-
-
-                    const unit =
-                        String(
-                            row["Unit"]
-                        ).trim();
-
-
-                    const mrp =
-                        Number(
-                            row["MRP"]
-                        );
-
-
-                    const salePrice =
-                        Number(
-                            row["Sale Price"]
-                        );
-
-
-                    /* Validate required fields */
-
-                    if (
-                        !id ||
-                        !name ||
-                        !unit ||
-                        isNaN(mrp) ||
-                        isNaN(salePrice)
-                    ) {
-
-                        errors.push(
-                            `Row ${rowNumber}: Missing or invalid data`
-                        );
-
-                        return;
-
-                    }
-
-
-                    if (mrp < 0 || salePrice < 0) {
-
-                        errors.push(
-                            `Row ${rowNumber}: Price cannot be negative`
-                        );
-
-                        return;
-
-                    }
-
-
-                    if (salePrice > mrp) {
-
-                        errors.push(
-                            `Row ${rowNumber}: Sale Price cannot be higher than MRP`
-                        );
-
-                        return;
-
-                    }
-
-
+                if (name && !isNaN(mrp) && !isNaN(salePrice) && salePrice <= mrp) {
                     importedProducts.push({
-
-                        id: id,
-
-                        name: name,
-
-                        mrp: mrp,
-
-                        salePrice: salePrice,
-
-                        unit: unit,
-
-                        category:
-                            category ||
-                            "General"
-
+                        id: String(row["Item Code"] || Date.now() + index),
+                        name,
+                        mrp,
+                        salePrice,
+                        unit: String(row["Unit"] || "piece").trim(),
+                        category: String(row["Category"] || "General").trim()
                     });
-
                 }
-            );
+            });
 
-
-            /* Stop if nothing valid was imported */
-
-            if (
-                importedProducts.length === 0
-            ) {
-
-                alert(
-                    "No valid products were found in the Excel file."
-                );
-
-                return;
-
+            if (importedProducts.length > 0 && confirm(`Found ${importedProducts.length} valid items. Do you want to replace your existing product catalog?`)) {
+                products = importedProducts;
+                saveProducts();
+                updateInventoryStats();
+                alert(`Successfully imported ${importedProducts.length} products!`);
+            } else if (importedProducts.length === 0) {
+                alert("No valid product data found. Please check column headers (Item Name, MRP, Sale Price).");
             }
-
-
-            /* Ask before replacing existing products */
-
-            const confirmed =
-                confirm(
-                    `Found ${importedProducts.length} valid products.\n\n` +
-                    `Importing this Excel file will replace the current product list.\n\n` +
-                    `Do you want to continue?`
-                );
-
-
-            if (!confirmed) {
-
-                return;
-
-            }
-
-
-            /* Replace product database */
-
-            products =
-                importedProducts;
-
-
-            /* Save imported products */
-
-            saveProducts();
-
-
-            /* Update dashboard */
-
-            updateInventoryStats();
-
-
-            /* Clear current search */
-
-            productSearch.value = "";
-
-            hideSearchResults();
-
-
-            /* Show result */
-
-            let message =
-                `Successfully imported ${importedProducts.length} products.`;
-
-
-            if (errors.length > 0) {
-
-                message +=
-                    `\n\n${errors.length} row(s) were skipped because of errors.`;
-
-            }
-
-
-            alert(message);
-
-
-            console.log(
-                "Imported products:",
-                products
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Excel import error:",
-                error
-            );
-
-
-            alert(
-                "Unable to read this Excel file. Please make sure you are using the correct Excel template."
-            );
-
+        } catch (err) {
+            alert("Error parsing Excel file. Please ensure it is a valid .xlsx or .xls file.");
         }
-
     };
-
-
-    reader.onerror = function () {
-
-        alert(
-            "Could not read the selected Excel file."
-        );
-
-    };
-
-
     reader.readAsArrayBuffer(file);
-
 }
 
-
-/* =========================================================
-   29. HIDE SEARCH RESULTS
-========================================================= */
-
-function hideSearchResults() {
-
-    searchResults.style.display =
-        "none";
-
-}
-
-
-/* =========================================================
-   30. FORMAT MONEY
-========================================================= */
-
+/* Helper Utilities */
 function formatMoney(amount) {
-
-    return Number(amount)
-        .toLocaleString(
-            "en-IN",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        );
-
+    return Number(amount || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
-
-/* =========================================================
-   31. ESCAPE HTML
-   Prevents product names from injecting HTML.
-========================================================= */
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /[&<>"']/g,
-            character => {
-
-                const entities = {
-
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#039;"
-
-                };
-
-                return entities[character];
-
-            }
-        );
-
+function escapeHTML(str) {
+    return String(str || "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[c]));
 }
-
-
-/* =========================================================
-   32. LOAD SAVED DATA
-========================================================= */
-
-loadProducts();
-
-updateSalesDashboard();
