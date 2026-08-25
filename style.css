@@ -2,7 +2,6 @@
    THEME VARIABLES (DARK & LIGHT)
 =========================================== */
 :root {
-    /* Dark Theme (Default) */
     --bg-main: #0f172a;
     --bg-header: #1e293b;
     --card-bg: #1e293b;
@@ -25,7 +24,6 @@
     --input-bg: #0f172a;
 }
 
-/* Light Mode Overrides */
 [data-theme="light"] {
     --bg-main: #f1f5f9;
     --bg-header: #ffffff;
@@ -125,7 +123,6 @@ body {
     color: var(--text-muted);
 }
 
-/* Theme Switcher Button */
 .theme-toggle-btn {
     background: var(--card-bg-hover);
     border: 1px solid var(--border-color);
@@ -145,7 +142,6 @@ body {
     transform: scale(1.08);
 }
 
-/* Integrated Invoice Information */
 .header-invoice-info {
     display: flex;
     gap: 24px;
@@ -177,7 +173,6 @@ body {
     color: var(--text-muted);
 }
 
-/* Header Buttons */
 .header-actions {
     display: flex;
     gap: 10px;
@@ -208,7 +203,6 @@ body {
     background: var(--primary-hover);
 }
 
-/* Customer Information Bar */
 .header-customer-bar {
     display: flex;
     gap: 16px;
@@ -268,7 +262,7 @@ body {
 }
 
 /* ==========================================
-   SEARCH BAR & SEARCH DROPDOWN STYLES
+   SEARCH BAR
 =========================================== */
 .product-search-section {
     position: relative;
@@ -326,7 +320,6 @@ body {
     cursor: pointer;
 }
 
-/* Search Results Dropdown Overlay */
 .search-results {
     position: absolute;
     top: 100%;
@@ -347,7 +340,6 @@ body {
     display: block;
 }
 
-/* Search Result List Item */
 .search-result-item {
     padding: 12px 16px;
     display: flex;
@@ -392,17 +384,13 @@ body {
     margin-left: 6px;
 }
 
-/* ==========================================
-   HOVER & ARROW KEY NAVIGATION HIGHLIGHT
-=========================================== */
 .search-result-item:hover,
 .search-result-item.selected {
-    background-color: #6d28d9 !important; /* Rich Purple Background */
-    color: #ffffff !important;            /* Pure White Text */
-    border-left: none !important;          /* Removes the green border */
+    background-color: #6d28d9 !important;
+    color: #ffffff !important;
+    border-left: none !important;
 }
 
-/* Ensures text inside the item also turns white on hover/arrow selection */
 .search-result-item:hover *,
 .search-result-item.selected * {
     color: #ffffff !important;
@@ -454,8 +442,8 @@ body {
 }
 
 .table-container {
-    max-height: 420px; /* Fixed height for ~6-7 rows */
-    overflow-y: auto;  /* Shows vertical scrollbar when items exceed height */
+    max-height: 480px;
+    overflow-y: auto;
     overflow-x: hidden;
     position: relative;
 }
@@ -825,4 +813,57 @@ body {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
+}
+
+/* ==========================================
+   PRINT STYLES - HIDES EVERYTHING EXCEPT BILL
+=========================================== */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Hide non-bill UI elements */
+    .header-actions,
+    .theme-toggle-btn,
+    .product-search-section,
+    .table-search-wrapper,
+    .bill-actions,
+    .billing-sidebar,
+    .modal-overlay,
+    .btn-remove,
+    th:last-child,
+    td:last-child,
+    .table-container button {
+        display: none !important;
+    }
+
+    .app-container {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .table-container {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .bill-items-card, .bill-summary, .app-header {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .bill-table th, .bill-table td {
+        border-bottom: 1px solid #000000 !important;
+        color: #000000 !important;
+    }
+
+    .bill-savings-banner {
+        border: 1px solid #000000 !important;
+        background: transparent !important;
+    }
 }
