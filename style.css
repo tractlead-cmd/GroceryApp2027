@@ -407,6 +407,7 @@ body {
 .search-result-item.selected * {
     color: #ffffff !important;
 }
+
 /* ==========================================
    BILL ITEMS TABLE
 =========================================== */
@@ -453,7 +454,26 @@ body {
 }
 
 .table-container {
-    overflow-x: auto;
+    max-height: 420px; /* Fixed height for ~6-7 rows */
+    overflow-y: auto;  /* Shows vertical scrollbar when items exceed height */
+    overflow-x: hidden;
+    position: relative;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.table-container table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--input-bg);
 }
 
 .bill-table {
@@ -805,32 +825,4 @@ body {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
-}
-
-
-/* Container scrollbar for 50+ items */
-.bill-table-container, 
-.table-responsive {
-    max-height: 420px; /* Fixed height for ~6-7 rows */
-    overflow-y: auto;  /* Shows vertical scrollbar when items exceed height */
-    overflow-x: hidden;
-    position: relative;
-}
-
-/* Keep table header fixed at the top while scrolling */
-.bill-table-container table thead th,
-.table-responsive table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: #171e2e; /* Matches dark theme background */
-}
-
-/* Custom scrollbar styling */
-.bill-table-container::-webkit-scrollbar {
-    width: 6px;
-}
-.bill-table-container::-webkit-scrollbar-thumb {
-    background: #2c384e;
-    border-radius: 4px;
 }
