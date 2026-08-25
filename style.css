@@ -583,47 +583,77 @@ select {
     overflow: hidden;
 }
 
+/* =========================================================
+   TABLE HEADER & INLINE SEARCH
+========================================================= */
+
 .table-header {
-    min-height: 50px;
-
-    padding: 0 16px;
-
+    min-height: 54px;
+    padding: 8px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
+    gap: 12px;
     background: var(--surface-soft);
-
     border-bottom: 1px solid var(--border);
 }
 
-.table-header h3 {
-    font-size: 13px;
-
-    font-weight: 750;
+/* Inline Search Input */
+.table-search-wrapper {
+    flex: 1;
+    max-width: 260px;
 }
 
-.table-header > span {
-    padding: 4px 9px;
+.table-search-wrapper input {
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-    border-radius: 20px;
+.table-search-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.08);
+}
 
-    background: #edf1ef;
-
-    color: var(--text-secondary);
-
-    font-size: 10px;
-
-    font-weight: 700;
+.table-search-wrapper input::placeholder {
+    color: var(--text-muted);
 }
 
 
-/* Table */
+/* =========================================================
+   TABLE CONTAINER SCROLLBAR
+========================================================= */
 
 .table-container {
     width: 100%;
+    max-height: 420px; /* Limits table height (~6-7 items visible) */
+    overflow-y: auto;   /* Adds vertical scrollbar when items exceed max-height */
+    overflow-x: auto;   /* Keeps horizontal scrollbar for mobile responsiveness */
+}
 
-    overflow-x: auto;
+/* Custom Scrollbar Styling for Table Container */
+.table-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: var(--surface-soft);
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #cbd5d2;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }
 
 .bill-table {
