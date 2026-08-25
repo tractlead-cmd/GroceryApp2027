@@ -185,6 +185,12 @@ function setupEventListeners() {
         handleProductSearch
     );
 
+   /* Search Billed Items */
+    const billedSearchInput = document.getElementById("billedItemsSearch");
+    if (billedSearchInput) {
+    billedSearchInput.addEventListener("input", renderBill);
+    }
+
 
     /* Clear search when clicking outside */
 
@@ -711,214 +717,135 @@ function addProductToBill(product) {
 
 
 /* =========================================================
-   11. RENDER BILL
+   11. RENDER BILL (WITH FILTERING)
 ========================================================= */
 
 function renderBill() {
 
     billItems.innerHTML = "";
 
-
     if (currentBill.length === 0) {
 
         billItems.innerHTML = `
-
             <tr class="empty-bill">
-
                 <td colspan="7">
-
                     <div class="empty-state">
-
-                        <div class="empty-icon">
-                            🛒
-                        </div>
-
+                        <div class="empty-icon">🛒</div>
                         <h4>No products added</h4>
-
-                        <p>
-                            Search for a product above
-                            to start the bill.
-                        </p>
-
+                        <p>Search for a product above to start the bill.</p>
                     </div>
-
                 </td>
-
             </tr>
-
         `;
 
         updateTotals();
-
         return;
 
     }
 
+    /* Read search query for already billed items */
+    const searchInput = document.getElementById("billedItemsSearch");
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-    currentBill.forEach(item => {
+    /* Filter items based on search term */
+    const filteredItems = currentBill.filter(item =>
+        item.name.toLowerCase().includes(searchTerm) ||
+        (item.category && item.category.toLowerCase().includes(searchTerm))
+    );
 
-        const row =
-            document.createElement("tr");
+    /* Display empty state if search yields no results */
+    if (filteredItems.length === 0) {
 
+        billItems.innerHTML = `
+            <tr class="empty-bill">
+                <td colspan="7">
+                    <div class="empty-state" style="padding: 24px 20px;">
+                        <p style="color: var(--text-muted); font-size: 12px;">
+                            No billed items match "<strong>${escapeHTML(searchTerm)}</strong>"
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        `;
 
-        const itemDiscount =
-            (
-                item.mrp -
-                item.salePrice
-            ) * item.quantity;
+        updateTotals();
+        return;
 
+    }
 
-        const itemAmount =
-            item.salePrice *
-            item.quantity;
+    /* Render filtered items */
+    filteredItems.forEach(item => {
 
+        const row = document.createElement("tr");
+
+        const itemDiscount = (item.mrp - item.salePrice) * item.quantity;
+        const itemAmount = item.salePrice * item.quantity;
 
         row.innerHTML = `
-
             <td>
-
-                <div style="
-                    font-weight:700;
-                    font-size:12px;
-                ">
+                <div style="font-weight:700; font-size:12px;">
                     ${escapeHTML(item.name)}
                 </div>
-
-                <div style="
-                    font-size:9px;
-                    color:#929b99;
-                    margin-top:2px;
-                ">
+                <div style="font-size:9px; color:#929b99; margin-top:2px;">
                     ${escapeHTML(item.unit)}
                 </div>
-
             </td>
 
-
             <td>
-
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    gap:5px;
-                ">
-
+                <div style="display:flex; align-items:center; gap:5px;">
                     <button
                         type="button"
                         class="quantity-btn"
                         data-action="decrease"
                         data-id="${item.id}"
-                        style="
-                            width:25px;
-                            height:25px;
-                            border:1px solid #e4e9e7;
-                            border-radius:6px;
-                            background:#fff;
-                            cursor:pointer;
-                        "
+                        style="width:25px; height:25px; border:1px solid #e4e9e7; border-radius:6px; background:#fff; cursor:pointer;"
                     >
                         −
                     </button>
 
-
-                    <strong style="
-                        min-width:20px;
-                        text-align:center;
-                    ">
+                    <strong style="min-width:20px; text-align:center;">
                         ${item.quantity}
                     </strong>
-
 
                     <button
                         type="button"
                         class="quantity-btn"
                         data-action="increase"
                         data-id="${item.id}"
-                        style="
-                            width:25px;
-                            height:25px;
-                            border:1px solid #e4e9e7;
-                            border-radius:6px;
-                            background:#fff;
-                            cursor:pointer;
-                        "
+                        style="width:25px; height:25px; border:1px solid #e4e9e7; border-radius:6px; background:#fff; cursor:pointer;"
                     >
                         +
                     </button>
-
                 </div>
-
             </td>
 
+            <td>₹${formatMoney(item.mrp)}</td>
+            <td><strong>₹${formatMoney(item.salePrice)}</strong></td>
 
             <td>
-                ₹${formatMoney(item.mrp)}
-            </td>
-
-
-            <td>
-
-                <strong>
-                    ₹${formatMoney(item.salePrice)}
-                </strong>
-
-            </td>
-
-
-            <td>
-
-                <span style="
-                    color:#16855f;
-                    font-weight:700;
-                ">
+                <span style="color:#16855f; font-weight:700;">
                     ₹${formatMoney(itemDiscount)}
                 </span>
-
             </td>
 
+            <td><strong>₹${formatMoney(itemAmount)}</strong></td>
 
             <td>
-
-                <strong>
-                    ₹${formatMoney(itemAmount)}
-                </strong>
-
-            </td>
-
-
-            <td>
-
                 <button
                     type="button"
                     class="remove-item"
                     data-id="${item.id}"
-                    style="
-                        width:28px;
-                        height:28px;
-                        border:0;
-                        border-radius:7px;
-                        background:#fff0ef;
-                        color:#d9534f;
-                        font-size:15px;
-                        cursor:pointer;
-                    "
+                    style="width:28px; height:28px; border:0; border-radius:7px; background:#fff0ef; color:#d9534f; font-size:15px; cursor:pointer;"
                     title="Remove"
                 >
                     ×
                 </button>
-
             </td>
-
         `;
-
 
         billItems.appendChild(row);
 
     });
-
-
-    /* Quantity buttons */
-
 
     updateTotals();
 
