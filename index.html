@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sri Raghavendra Grocery - Billing</title>
+
+    <!-- Main stylesheet - we'll create this next -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ==========================================
+         APP HEADER
+    =========================================== -->
+    <header class="app-header">
+
+        <div class="brand">
+            <div class="brand-icon">SR</div>
+
+            <div class="brand-text">
+                <h1>Sri Raghavendra Grocery</h1>
+                <span>Billing & Inventory</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="header-btn" id="productsBtn">
+                Products
+            </button>
+
+            <button class="header-btn" id="salesBtn">
+                Sales
+            </button>
+
+            <button class="header-btn primary" id="newBillBtn">
+                + New Bill
+            </button>
+        </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         MAIN APPLICATION
+    =========================================== -->
+    <main class="app-container">
+
+
+        <!-- ======================================
+             BILLING SECTION
+        ======================================= -->
+        <section class="billing-section">
+
+
+            <!-- BILL TOP BAR -->
+            <div class="billing-top">
+
+                <div>
+                    <span class="section-label">NEW BILL</span>
+                    <h2>Create Invoice</h2>
+                </div>
+
+                <div class="invoice-info">
+
+                    <div class="invoice-number">
+                        <span>Invoice</span>
+                        <strong id="invoiceNumber">#000001</strong>
+                    </div>
+
+                    <div class="invoice-date">
+                        <span>Date</span>
+                        <strong id="invoiceDate">--</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 CUSTOMER INFORMATION
+            =================================== -->
+            <div class="customer-card">
+
+                <div class="form-group">
+
+                    <label for="customerPhone">
+                        Customer Phone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="customerPhone"
+                        placeholder="Enter phone number"
+                        maxlength="10"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="customerName">
+                        Customer Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="customerName"
+                        placeholder="Optional"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="paymentMethod">
+                        Payment Method
+                    </label>
+
+                    <select id="paymentMethod">
+
+                        <option value="cash">
+                            Cash
+                        </option>
+
+                        <option value="upi">
+                            UPI
+                        </option>
+
+                        <option value="card">
+                            Card
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 PRODUCT SEARCH
+            =================================== -->
+            <div class="product-search-section">
+
+                <label for="productSearch">
+                    Add Products
+                </label>
+
+                <div class="search-wrapper">
+
+                    <span class="search-icon">⌕</span>
+
+                    <input
+                        type="text"
+                        id="productSearch"
+                        placeholder="Search product by name..."
+                        autocomplete="off"
+                    >
+
+                    <button
+                        type="button"
+                        class="scan-btn"
+                        id="scanBtn"
+                    >
+                        Scan
+                    </button>
+
+                </div>
+
+
+                <!-- Search results will appear here -->
+                <div
+                    class="search-results"
+                    id="searchResults"
+                ></div>
+
+            </div>
+
+
+            <!-- ==================================
+                 BILL ITEMS TABLE
+            =================================== -->
+            <div class="bill-items-card">
+
+                <div class="table-header">
+
+                    <h3>Bill Items</h3>
+
+                    <span id="itemCount">
+                        0 Items
+                    </span>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table class="bill-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Product</th>
+
+                                <th>Qty</th>
+
+                                <th>MRP</th>
+
+                                <th>Sale Price</th>
+
+                                <th>Discount</th>
+
+                                <th>Amount</th>
+
+                                <th></th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="billItems">
+
+                            <!--
+                                Products added to the bill
+                                will appear here using JavaScript.
+                            -->
+
+                            <tr class="empty-bill">
+
+                                <td colspan="7">
+
+                                    <div class="empty-state">
+
+                                        <div class="empty-icon">
+                                            🛒
+                                        </div>
+
+                                        <h4>No products added</h4>
+
+                                        <p>
+                                            Search for a product above
+                                            to start the bill.
+                                        </p>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 BILL SUMMARY
+            =================================== -->
+            <div class="bill-summary">
+
+                <div class="summary-row">
+
+                    <span>Total MRP</span>
+
+                    <strong id="totalMrp">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row savings">
+
+                    <span>You Save</span>
+
+                    <strong id="totalSavings">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-divider"></div>
+
+
+                <div class="summary-row grand-total">
+
+                    <span>Grand Total</span>
+
+                    <strong id="grandTotal">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================
+                 BILL ACTIONS
+            =================================== -->
+            <div class="bill-actions">
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="clearBillBtn"
+                >
+                    Clear Bill
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="saveBillBtn"
+                >
+                    Save Bill
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn primary large"
+                    id="printBillBtn"
+                >
+                    Print Bill
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             RIGHT SIDEBAR
+        ======================================= -->
+        <aside class="billing-sidebar">
+
+
+            <!-- TODAY'S SALES -->
+            <div class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+                        <span class="card-label">
+                            TODAY
+                        </span>
+
+                        <h3>Sales</h3>
+                    </div>
+
+                    <span class="card-icon">
+                        ₹
+                    </span>
+
+                </div>
+
+
+                <div class="sales-amount" id="todaySales">
+                    ₹0
+                </div>
+
+
+                <div class="sales-details">
+
+                    <div>
+                        <span>Bills</span>
+                        <strong id="todayBills">
+                            0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Items</span>
+                        <strong id="todayItems">
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+            <div class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+                        <span class="card-label">
+                            QUICK ACTIONS
+                        </span>
+
+                        <h3>Manage</h3>
+                    </div>
+
+                </div>
+
+
+                <div class="quick-actions">
+
+                    <button
+                        type="button"
+                        id="addProductBtn"
+                    >
+                        <span>＋</span>
+                        Add Product
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="importExcelBtn"
+                    >
+                        <span>⇧</span>
+                        Import Excel
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="viewSalesBtn"
+                    >
+                        <span>▤</span>
+                        View Sales
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="settingsBtn"
+                    >
+                        <span>⚙</span>
+                        Settings
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOW STOCK -->
+            <div class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+                        <span class="card-label">
+                            INVENTORY
+                        </span>
+
+                        <h3>Stock Status</h3>
+                    </div>
+
+                </div>
+
+
+                <div class="stock-status">
+
+                    <div class="stock-row">
+
+                        <span>
+                            Total Products
+                        </span>
+
+                        <strong id="totalProducts">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-row">
+
+                        <span>
+                            Low Stock
+                        </span>
+
+                        <strong id="lowStock">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stock-row">
+
+                        <span>
+                            Out of Stock
+                        </span>
+
+                        <strong id="outOfStock">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </aside>
+
+    </main>
+
+
+    <!-- ==========================================
+         PRODUCT MODAL
+         We'll activate this with JavaScript later.
+    =========================================== -->
+    <div
+        class="modal-overlay"
+        id="productModal"
+        hidden
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+                    <span class="section-label">
+                        PRODUCT
+                    </span>
+
+                    <h2>Add Product</h2>
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeProductModal"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="productForm">
+
+                <div class="form-group">
+
+                    <label for="productName">
+                        Product Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="productName"
+                        placeholder="Example: Aashirvaad Atta 5kg"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="productMrp">
+                            MRP
+                        </label>
+
+                        <input
+                            type="number"
+                            id="productMrp"
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="productSalePrice">
+                            Sale Price
+                        </label>
+
+                        <input
+                            type="number"
+                            id="productSalePrice"
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="productUnit">
+                            Unit
+                        </label>
+
+                        <select id="productUnit">
+
+                            <option value="piece">
+                                Piece
+                            </option>
+
+                            <option value="kg">
+                                Kg
+                            </option>
+
+                            <option value="gram">
+                                Gram
+                            </option>
+
+                            <option value="litre">
+                                Litre
+                            </option>
+
+                            <option value="ml">
+                                ML
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="productCategory">
+                            Category
+                        </label>
+
+                        <input
+                            type="text"
+                            id="productCategory"
+                            placeholder="Example: Rice"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="btn secondary"
+                        id="cancelProductBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn primary"
+                    >
+                        Save Product
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         JAVASCRIPT
+         We'll create app.js next.
+    =========================================== -->
+    <script src="app.js"></script>
+
+</body>
+</html>
