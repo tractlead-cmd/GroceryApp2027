@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // INITIALIZATION & DUMMY DATA
     // ==========================================
-    let products = JSON.parse(localStorage.getItem('products')) || [
+    let defaultProducts = [
         { id: 1, name: 'Tata Salt', mrp: 30.00, salePrice: 28.00, category: 'Salt', unit: '1 kg' },
         { id: 2, name: 'Tata Tea', mrp: 140.00, salePrice: 132.00, category: 'Beverages', unit: '250 g' },
         { id: 3, name: 'Tata Glucose Biscuits', mrp: 10.00, salePrice: 10.00, category: 'Biscuits', unit: '100 g' },
@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 7, name: 'Parachute Coconut Oil', mrp: 85.00, salePrice: 80.00, category: 'Personal Care', unit: '200 ml' }
     ];
 
+    let products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
     let currentBill = [];
-    let selectedIndex = -1; // Index for search navigation
+    let selectedIndex = -1; // Search selection index
 
     // DOM Elements
     const productSearchInput = document.getElementById('productSearch');
@@ -27,15 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const invoiceDateEl = document.getElementById('invoiceDate');
     const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-    // Action Buttons
+    // Buttons
     const addProductBtn = document.getElementById('addProductBtn');
     const clearBillBtn = document.getElementById('clearBillBtn');
     const printBillBtn = document.getElementById('printBillBtn');
-    const saveBillBtn = document.getElementById('saveBillBtn'); // Optional Save Button element
+    const saveBillBtn = document.getElementById('saveBillBtn');
     const importExcelBtn = document.getElementById('importExcelBtn');
     const excelFileInput = document.getElementById('excelFileInput');
 
-    // Modal Elements
+    // Modal
     const productModal = document.getElementById('productModal');
     const closeProductModal = document.getElementById('closeProductModal');
     const cancelProductBtn = document.getElementById('cancelProductBtn');
@@ -52,43 +53,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. GLOBAL KEYBOARD SHORTCUTS
     // ==========================================
     document.addEventListener('keydown', (e) => {
-        // Detect Ctrl key (or Cmd key on Mac)
         const isCtrl = e.ctrlKey || e.metaKey;
-
         if (isCtrl) {
             const key = e.key.toLowerCase();
-
-            // Ctrl + S : Save / Checkout Bill
             if (key === 's') {
                 e.preventDefault();
                 saveBillAction();
-            }
-            // Ctrl + Q : Clear Current Bill
-            else if (key === 'q') {
+            } else if (key === 'q') {
                 e.preventDefault();
                 clearBillAction();
-            }
-            // Ctrl + P : Print Bill
-            else if (key === 'p') {
+            } else if (key === 'p') {
                 e.preventDefault();
                 printBillAction();
-            }
-            // Ctrl + N : New Bill
-            else if (key === 'n') {
+            } else if (key === 'n') {
                 e.preventDefault();
                 newBillAction();
             }
         }
     });
 
-    // Helper Action Functions for Shortcuts & Buttons
     function saveBillAction() {
         if (currentBill.length === 0) {
             alert('Cannot save an empty bill. Add products first!');
             return;
         }
         alert('Bill saved successfully!');
-        // Additional save logic (e.g., API call or storing sales history) can go here
     }
 
     function clearBillAction() {
@@ -110,24 +99,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function newBillAction() {
         if (currentBill.length > 0) {
-            if (!confirm('Start a new bill? Current unsaved items will be cleared.')) {
-                return;
-            }
+            if (!confirm('Start a new bill? Current unsaved items will be cleared.')) return;
         }
         currentBill = [];
         renderBill();
-        if (productSearchInput) {
-            productSearchInput.focus();
-        }
+        if (productSearchInput) productSearchInput.focus();
     }
 
-    // Connect Action Buttons to Functions
     if (clearBillBtn) clearBillBtn.addEventListener('click', clearBillAction);
     if (printBillBtn) printBillBtn.addEventListener('click', printBillAction);
     if (saveBillBtn) saveBillBtn.addEventListener('click', saveBillAction);
 
     // ==========================================
-    // 2. THEME TOGGLE (DARK / LIGHT MODE)
+    // 2. THEME TOGGLE
     // ==========================================
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -159,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. SEARCH & ARROW KEY NAVIGATION
+    // 3. SEARCH & ARROW KEY NAVIGATION (SAFE)
     // ==========================================
     if (productSearchInput && searchResults) {
         productSearchInput.addEventListener('input', (e) => {
@@ -167,12 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedIndex = -1;
 
             if (!query) {
-                searchResults.classList.remove('active');
-                searchResults.innerHTML = '';
+                closeSearchResults();
                 return;
             }
 
-            const matches = products.filter(p => p.name.toLowerCase().includes(query));
+            // Safe filter guard checking for valid strings
+            const matches = products.filter(p => 
+                p && p.name && String(p.name).toLowerCase().includes(query)
+            );
+            
             renderSearchResults(matches);
         });
 
@@ -202,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderSearchResults(matches) {
         searchResults.innerHTML = '';
         
-        if (matches.length === 0) {
+        if (!matches || matches.length === 0) {
             searchResults.innerHTML = `<div class="search-result-item" style="cursor: default;"><span class="item-name">No products found</span></div>`;
             searchResults.classList.add('active');
             return;
@@ -214,11 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
             item.innerHTML = `
                 <div class="item-details">
                     <span class="item-name">${product.name}</span>
-                    <span class="item-meta">${product.category} · ${product.unit}</span>
+                    <span class="item-meta">${product.category || 'General'} · ${product.unit || '1 Pcs'}</span>
                 </div>
                 <div class="item-price-block">
-                    <span class="item-price">₹${Number(product.salePrice).toFixed(2)}</span>
-                    <span class="item-mrp">₹${Number(product.mrp).toFixed(2)}</span>
+                    <span class="item-price">₹${Number(product.salePrice || 0).toFixed(2)}</span>
+                    <span class="item-mrp">₹${Number(product.mrp || 0).toFixed(2)}</span>
                 </div>
             `;
 
@@ -296,17 +283,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentBill.forEach((item, index) => {
-            const discount = (item.mrp - item.salePrice) * item.qty;
-            const amount = item.salePrice * item.qty;
+            const discount = ((Number(item.mrp) || 0) - (Number(item.salePrice) || 0)) * item.qty;
+            const amount = (Number(item.salePrice) || 0) * item.qty;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${item.name}</strong><br><small style="color:var(--text-muted);">${item.unit}</small></td>
+                <td><strong>${item.name}</strong><br><small style="color:var(--text-muted);">${item.unit || ''}</small></td>
                 <td>
                     <input type="number" class="qty-input" min="1" value="${item.qty}" data-index="${index}">
                 </td>
-                <td>₹${Number(item.mrp).toFixed(2)}</td>
-                <td>₹${Number(item.salePrice).toFixed(2)}</td>
+                <td>₹${Number(item.mrp || 0).toFixed(2)}</td>
+                <td>₹${Number(item.salePrice || 0).toFixed(2)}</td>
                 <td style="color:var(--primary-color);">₹${discount.toFixed(2)}</td>
                 <td><strong>₹${amount.toFixed(2)}</strong></td>
                 <td><button type="button" class="btn-remove" data-index="${index}">×</button></td>
@@ -344,8 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalItems = 0;
 
         currentBill.forEach(item => {
-            totalMrp += item.mrp * item.qty;
-            grandTotal += item.salePrice * item.qty;
+            totalMrp += (Number(item.mrp) || 0) * item.qty;
+            grandTotal += (Number(item.salePrice) || 0) * item.qty;
             totalItems += item.qty;
         });
 
@@ -358,11 +345,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 5. IMPORT EXCEL / CSV HANDLING
+    // 5. CSV FILE PARSER & IMPORT
     // ==========================================
     if (importExcelBtn) {
         importExcelBtn.addEventListener('click', () => {
             if (excelFileInput) {
+                excelFileInput.accept = '.csv, .json';
                 excelFileInput.click();
             } else {
                 const fileInput = document.createElement('input');
@@ -391,22 +379,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const content = e.target.result;
                 let importedData = [];
 
-                if (file.name.endsWith('.json')) {
+                if (file.name.toLowerCase().endsWith('.json')) {
                     importedData = JSON.parse(content);
                 } else {
-                    const lines = content.split('\n');
+                    // Robust CSV Parser line-by-line
+                    const lines = content.split(/\r\n|\n/);
                     lines.forEach((line, i) => {
-                        if (i === 0 || !line.trim()) return;
-                        const cols = line.split(',');
-                        if (cols.length >= 3) {
-                            importedData.push({
-                                id: Date.now() + i,
-                                name: cols[0].trim(),
-                                mrp: parseFloat(cols[1]) || 0,
-                                salePrice: parseFloat(cols[2]) || 0,
-                                category: cols[3] ? cols[3].trim() : 'General',
-                                unit: cols[4] ? cols[4].trim() : '1 Pcs'
-                            });
+                        if (i === 0 || !line.trim()) return; // Skip header / empty lines
+                        
+                        // Parse values handling quotes
+                        const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                        
+                        if (cols.length >= 2) {
+                            const name = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : '';
+                            const mrp = parseFloat(cols[1] ? cols[1].replace(/[^0-9.]/g, '') : 0) || 0;
+                            const salePrice = parseFloat(cols[2] ? cols[2].replace(/[^0-9.]/g, '') : mrp) || mrp;
+                            const category = cols[3] ? cols[3].replace(/^"|"$/g, '').trim() : 'General';
+                            const unit = cols[4] ? cols[4].replace(/^"|"$/g, '').trim() : '1 Pcs';
+
+                            if (name) {
+                                importedData.push({
+                                    id: Date.now() + i,
+                                    name: name,
+                                    mrp: mrp,
+                                    salePrice: salePrice,
+                                    category: category,
+                                    unit: unit
+                                });
+                            }
                         }
                     });
                 }
@@ -417,10 +417,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(`Successfully imported ${importedData.length} products!`);
                     renderModalProductList();
                 } else {
-                    alert('Could not find valid product data in file.');
+                    alert('No valid product records found in CSV file.');
                 }
             } catch (err) {
-                alert('Error parsing file: ' + err.message);
+                alert('Error parsing CSV file: ' + err.message);
             }
         };
 
@@ -428,18 +428,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 6. ADD PRODUCT MODAL HANDLERS
+    // 6. ADD PRODUCT MODAL
     // ==========================================
     function renderModalProductList() {
         if (!modalProductList) return;
         modalProductList.innerHTML = products.map((p) => `
             <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
                 <div>
-                    <strong>${p.name}</strong> <small>(${p.unit})</small>
+                    <strong>${p.name}</strong> <small>(${p.unit || '1 Pcs'})</small>
                 </div>
                 <div>
-                    <span style="color: var(--primary-color); font-weight: bold;">₹${Number(p.salePrice).toFixed(2)}</span>
-                    <small style="text-decoration: line-through; color: var(--text-muted);">₹${Number(p.mrp).toFixed(2)}</small>
+                    <span style="color: var(--primary-color); font-weight: bold;">₹${Number(p.salePrice || 0).toFixed(2)}</span>
+                    <small style="text-decoration: line-through; color: var(--text-muted); margin-left: 6px;">₹${Number(p.mrp || 0).toFixed(2)}</small>
                 </div>
             </div>
         `).join('');
@@ -468,11 +468,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const newProduct = {
                 id: Date.now(),
-                name: document.getElementById('productName').value,
-                mrp: parseFloat(document.getElementById('productMrp').value),
-                salePrice: parseFloat(document.getElementById('productSalePrice').value),
-                unit: document.getElementById('productUnit').value || '1 Unit',
-                category: document.getElementById('productCategory') ? document.getElementById('productCategory').value : 'General'
+                name: document.getElementById('productName').value.trim(),
+                mrp: parseFloat(document.getElementById('productMrp').value) || 0,
+                salePrice: parseFloat(document.getElementById('productSalePrice').value) || 0,
+                unit: document.getElementById('productUnit').value.trim() || '1 Pcs',
+                category: document.getElementById('productCategory') ? document.getElementById('productCategory').value.trim() : 'General'
             };
 
             products.push(newProduct);
