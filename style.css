@@ -1632,3 +1632,29 @@ select {
     }
 
 }
+
+/* =========================================================
+   PRINT / PDF FIX FOR BILLED ITEMS
+========================================================= */
+@media print {
+    /* Expand table container to fit all items fully */
+    .table-container {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Hide the search bar on printed/downloaded invoices */
+    .table-search-wrapper {
+        display: none !important;
+    }
+
+    /* Ensure entire table page breaks cleanly if very long */
+    table {
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}
