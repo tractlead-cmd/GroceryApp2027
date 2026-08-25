@@ -26,6 +26,7 @@ let selectedSearchIndex = -1;
 ========================================================= */
 const productSearch = document.getElementById("productSearch");
 const searchResults = document.getElementById("searchResults");
+const billedItemsSearch = document.getElementById("billedItemsSearch");
 const billItems = document.getElementById("billItems");
 const itemCount = document.getElementById("itemCount");
 const totalMrp = document.getElementById("totalMrp");
@@ -42,6 +43,7 @@ const todayItems = document.getElementById("todayItems");
 const totalProducts = document.getElementById("totalProducts");
 const lowStock = document.getElementById("lowStock");
 const outOfStock = document.getElementById("outOfStock");
+const themeToggleBtn = document.getElementById("themeToggleBtn");
 
 /* =========================================================
    3. APPLICATION INITIALIZATION
@@ -77,13 +79,28 @@ function setupKeyboardShortcuts() {
    5. EVENT LISTENERS & DELEGATION
 ========================================================= */
 function setupEventListeners() {
-    /* Product Search Input (Master Search + In-Bill Real-time Filter) */
+    /* Product Search Input (Master Search Dropdown) */
     if (productSearch) {
-        productSearch.addEventListener("input", (e) => {
-            handleProductSearch();
+        productSearch.addEventListener("input", handleProductSearch);
+        productSearch.addEventListener("keydown", handleSearchKeyDown);
+    }
+
+    /* In-Bill Real-time Filter */
+    if (billedItemsSearch) {
+        billedItemsSearch.addEventListener("input", (e) => {
             filterTableRows(e.target.value.trim().toLowerCase());
         });
-        productSearch.addEventListener("keydown", handleSearchKeyDown);
+    }
+
+    /* Theme Switcher Toggle */
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", newTheme);
+            const icon = themeToggleBtn.querySelector(".theme-icon");
+            if (icon) icon.textContent = newTheme === "light" ? "☀️" : "🌙";
+        });
     }
 
     /* Close Dropdown on Outside Click */
@@ -239,28 +256,15 @@ function displaySearchResults(matches) {
     matches.forEach((product) => {
         const result = document.createElement("div");
         result.className = "search-result-item";
-        result.style.cssText = `
-            width:100%; padding:10px 14px; border-bottom:1px solid #eef1f0;
-            background:#fff; display:flex; align-items:center; justify-content:space-between;
-            gap:15px; text-align:left; cursor:pointer; color:#1b2422;
-        `;
 
         result.innerHTML = `
-            <div>
-                <strong style="display:block; font-size:12px; color:#1b2422; margin-bottom:2px;">
-                    ${escapeHTML(product.name)}
-                </strong>
-                <span style="font-size:10px; color:#929b99;">
-                    ${escapeHTML(product.category || 'General')} · ${escapeHTML(product.unit || 'piece')}
-                </span>
+            <div class="item-details">
+                <span class="item-name">${escapeHTML(product.name)}</span>
+                <span class="item-meta">${escapeHTML(product.category || 'General')} · ${escapeHTML(product.unit || 'piece')}</span>
             </div>
-            <div style="text-align:right; white-space:nowrap;">
-                <strong style="display:block; font-size:12px; color:#176b5b;">
-                    ₹${formatMoney(product.salePrice)}
-                </strong>
-                <span style="font-size:10px; color:#929b99; text-decoration:line-through;">
-                    ₹${formatMoney(product.mrp)}
-                </span>
+            <div class="item-price-block">
+                <span class="item-price">₹${formatMoney(product.salePrice)}</span>
+                <span class="item-mrp">₹${formatMoney(product.mrp)}</span>
             </div>
         `;
 
@@ -274,10 +278,10 @@ function displaySearchResults(matches) {
 function updateSearchHighlight(results) {
     results.forEach((item, index) => {
         if (index === selectedSearchIndex) {
-            item.style.background = "#eef7f5";
+            item.classList.add("selected");
             item.scrollIntoView({ block: "nearest" });
         } else {
-            item.style.background = "#fff";
+            item.classList.remove("selected");
         }
     });
 }
@@ -323,9 +327,12 @@ function renderBill() {
     if (currentBill.length === 0) {
         billItems.innerHTML = `
             <tr class="empty-bill">
-                <td colspan="7" style="text-align:center; padding:30px; color:#888;">
-                    <h4>No products added</h4>
-                    <p style="font-size:12px;">Search for a product above to start the bill.</p>
+                <td colspan="7">
+                    <div class="empty-state">
+                        <div class="empty-icon">🛒</div>
+                        <h4>No products added</h4>
+                        <p>Search for a product above to start the bill.</p>
+                    </div>
                 </td>
             </tr>
         `;
@@ -341,32 +348,32 @@ function renderBill() {
         row.innerHTML = `
             <td>
                 <div style="font-weight:700; font-size:12px;">${escapeHTML(item.name)}</div>
-                <div style="font-size:10px; color:#888; margin-top:2px;">${escapeHTML(item.unit)}</div>
+                <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">${escapeHTML(item.unit)}</div>
             </td>
             <td>
                 <div style="display:inline-flex; align-items:center; gap:6px;">
                     <button type="button" data-action="decrease" data-id="${item.id}"
-                        style="width:26px; height:26px; border:1px solid #ccc; border-radius:4px; background:#fff; cursor:pointer; font-weight:bold;">−</button>
+                        style="width:26px; height:26px; border:1px solid var(--border-color); border-radius:4px; background:var(--card-bg); color:var(--text-main); cursor:pointer; font-weight:bold;">−</button>
                     <span style="min-width:20px; text-align:center; font-weight:bold;">${item.quantity}</span>
                     <button type="button" data-action="increase" data-id="${item.id}"
-                        style="width:26px; height:26px; border:1px solid #ccc; border-radius:4px; background:#fff; cursor:pointer; font-weight:bold;">+</button>
+                        style="width:26px; height:26px; border:1px solid var(--border-color); border-radius:4px; background:var(--card-bg); color:var(--text-main); cursor:pointer; font-weight:bold;">+</button>
                 </div>
             </td>
             <td>₹${formatMoney(item.mrp)}</td>
             <td><strong>₹${formatMoney(item.salePrice)}</strong></td>
-            <td><span style="color:#28a745; font-weight:bold;">₹${formatMoney(itemDiscount)}</span></td>
+            <td><span style="color:var(--primary-color); font-weight:bold;">₹${formatMoney(itemDiscount)}</span></td>
             <td><strong>₹${formatMoney(itemAmount)}</strong></td>
             <td>
                 <button type="button" data-action="remove" data-id="${item.id}"
-                    style="width:26px; height:26px; border:0; border-radius:4px; background:#f8d7da; color:#721c24; font-weight:bold; cursor:pointer;" title="Remove">×</button>
+                    style="width:26px; height:26px; border:0; border-radius:4px; background:rgba(239,68,68,0.2); color:var(--danger-color); font-weight:bold; cursor:pointer;" title="Remove">×</button>
             </td>
         `;
         billItems.appendChild(row);
     });
 
-    /* Apply active filter text if user has search query typed */
-    if (productSearch && productSearch.value.trim()) {
-        filterTableRows(productSearch.value.trim().toLowerCase());
+    /* Re-apply search filter if items were typed in billedItemsSearch */
+    if (billedItemsSearch && billedItemsSearch.value.trim()) {
+        filterTableRows(billedItemsSearch.value.trim().toLowerCase());
     }
 
     updateTotals();
@@ -387,6 +394,18 @@ function updateTotals() {
     if (totalSavings) totalSavings.textContent = "₹" + formatMoney(savings);
     if (grandTotal) grandTotal.textContent = "₹" + formatMoney(saleTotal);
     if (itemCount) itemCount.textContent = totalItems + (totalItems === 1 ? " Item" : " Items");
+
+    /* Savings & Thank You Banner Logic */
+    const banner = document.getElementById("billThankYouBanner");
+    const bannerAmount = document.getElementById("bannerSavingsAmount");
+    if (banner && bannerAmount) {
+        if (currentBill.length > 0 && savings > 0) {
+            bannerAmount.textContent = "₹" + formatMoney(savings);
+            banner.style.display = "block";
+        } else {
+            banner.style.display = "none";
+        }
+    }
 }
 
 /* =========================================================
@@ -401,6 +420,7 @@ function clearBill() {
     if (customerName) customerName.value = "";
     if (paymentMethod) paymentMethod.value = "cash";
     if (productSearch) productSearch.value = "";
+    if (billedItemsSearch) billedItemsSearch.value = "";
     hideSearchResults();
     renderBill();
 }
@@ -413,6 +433,7 @@ function newBill() {
     if (customerName) customerName.value = "";
     if (paymentMethod) paymentMethod.value = "cash";
     if (productSearch) productSearch.value = "";
+    if (billedItemsSearch) billedItemsSearch.value = "";
     hideSearchResults();
     setInvoiceNumber();
     setInvoiceDate();
