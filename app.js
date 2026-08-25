@@ -199,7 +199,7 @@ function displaySearchResults(matches) {
 
 /* Handles Keyboard Up/Down/Enter in Search Box */
 function handleSearchKeyboardNavigation(event) {
-    const items = searchResults.querySelectorAll(".search-result-item");
+    const items = searchResults ? searchResults.querySelectorAll(".search-result-item") : [];
     if (!items.length || searchResults.style.display === "none") return;
 
     if (event.key === "ArrowDown") {
@@ -225,7 +225,7 @@ function handleSearchKeyboardNavigation(event) {
 function updateSearchHighlight(items) {
     items.forEach((item, index) => {
         if (index === selectedSearchIndex) {
-            item.style.background = "#484a4a"; // Active highlight color
+            item.style.background = "#eef7f5"; // Active highlight color
             item.scrollIntoView({ block: "nearest" });
         } else {
             item.style.background = "#fff";
@@ -264,8 +264,8 @@ function handleBillItemClick(event) {
     const button = event.target.closest("button");
     if (!button) return;
 
-    const id = Number(button.dataset.id);
-    const item = currentBill.find(product => product.id === id);
+    const id = Number(button.dataset.id) || button.dataset.id;
+    const item = currentBill.find(product => product.id == id);
 
     if (button.classList.contains("quantity-btn")) {
         const action = button.dataset.action;
@@ -288,7 +288,7 @@ function handleBillItemClick(event) {
 }
 
 function removeProduct(id) {
-    currentBill = currentBill.filter(item => item.id !== id);
+    currentBill = currentBill.filter(item => item.id != id);
     renderBill();
 }
 
